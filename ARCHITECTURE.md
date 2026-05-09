@@ -2,7 +2,7 @@
 
 ## 📋 Project Overview
 
-**Memo** is an intelligent AI-powered personal assistant that operates through WhatsApp. It processes natural language messages, extracts cognitive intent, manages tasks/reminders/notes, stores memories, and provides contextual responses. The system uses a skill-based architecture where users can enable different capabilities (task management, scheduling, note-taking, etc.) dynamically.
+**Memo** is an intelligent AI-powered business and operations assistant that operates through WhatsApp. It processes natural language messages, extracts cognitive intent, manages tasks/reminders/notes, stores memories, and provides contextual responses. The system uses a skill-based architecture where users can enable different capabilities (task management, scheduling, note-taking, etc.) dynamically.
 
 ### **Available Skills**
 
@@ -136,11 +136,10 @@ Lightweight organizational coordination system for managing employees, attendanc
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      DATA PERSISTENCE LAYER                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │ PostgreSQL   │  │ Cloudflare   │  │ Redis        │         │
-│  │ (Neon)       │  │ R2 (S3)      │  │ (BullMQ)     │         │
-│  │ + pgvector   │  │              │  │              │         │
-│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│  ┌──────────────────────────────┐  ┌──────────────────────────┐ │
+│  │ PostgreSQL (Neon)            │  │ Cloudflare R2 (S3)       │ │
+│  │ + pgvector Extension         │  │ Media & Voice Storage    │ │
+│  └──────────────────────────────┘  └──────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
                              │
                              ▼
@@ -212,15 +211,10 @@ Lightweight organizational coordination system for managing employees, attendanc
   - Cost-effective alternative to AWS S3
   - **@aws-sdk/client-s3** (v3.1045.0) - S3 client library
 
-### **Task Queue & Scheduling**
-- **BullMQ** (v5.76.6) - Redis-based job queue
-  - Background job processing
-  - Retry logic
-  - Job prioritization
-- **ioredis** (v5.10.1) - Redis client
+### **Cron Scheduling**
 - **node-cron** (v4.2.1) - Cron job scheduler
-  - Reminder execution (runs every minute)
-  - Scheduled action processing
+  - Executes task and reminder checks every minute
+  - Automated dynamic action scheduler and process dispatcher
 
 ### **Utilities**
 - **zod** (v4.4.3) - Runtime type validation and schema parsing
