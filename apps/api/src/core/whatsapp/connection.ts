@@ -279,6 +279,20 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
       client.connectionStatus = "connected";
       client.qrCode = undefined;
       console.log(`🎉 WhatsApp successfully connected for user: ${userId}`);
+
+      // Persist the connected phone number on the session
+      try {
+        const waPhone: string | undefined = socket.user?.id?.split(":")[0]?.split("@")[0];
+        if (waPhone) {
+          await prisma.whatsAppSession.update({
+            where: { userId },
+            data: { phone: waPhone },
+          });
+          console.log(`📱 Saved WhatsApp phone number for user ${userId}: ${waPhone}`);
+        }
+      } catch (phoneErr) {
+        console.error(`Failed to save WhatsApp phone for user ${userId}:`, phoneErr);
+      }
     }
 
     if (connection === "close") {
