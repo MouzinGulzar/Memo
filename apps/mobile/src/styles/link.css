@@ -113,3 +113,41 @@
 .btn-secondary:hover {
   background: #3b4a54;
 }
+
+.btn-danger {
+  background: rgba(241, 92, 109, 0.12);
+  color: #f15c6d;
+  border: 1px solid rgba(241, 92, 109, 0.25);
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(241, 92, 109, 0.2);
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.success-msg {
+  color: #00a884;
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(0, 168, 132, 0.1);
+  border-radius: 8px;
+  width: 100%;
+}
