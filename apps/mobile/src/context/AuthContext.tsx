@@ -19,11 +19,16 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const u = localStorage.getItem("user");
-    return u ? JSON.parse(u) : null;
+    try {
+      const u = localStorage.getItem("user");
+      return u ? JSON.parse(u) : null;
+    } catch {
+      return null;
+    }
   });
 
   const login = (user: User) => {
+    localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   };
 
@@ -33,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     } finally {
+      localStorage.removeItem("user");
       setUser(null);
     }
   };

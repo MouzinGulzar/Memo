@@ -15,12 +15,13 @@ await app.register(cors, {
   credentials: true,
 });
 
-// Register API Key authentication middleware
-app.register(apiKeyAuthPlugin);
-
+// Cookie plugin must be registered before auth middleware
 await app.register(cookie, {
   secret: process.env.JWT_SECRET,
 });
+
+// Register auth middleware
+app.register(apiKeyAuthPlugin);
 // Register auth routes (public)
 app.register(authRoutes);
 

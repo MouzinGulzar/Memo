@@ -27,58 +27,66 @@ function getJwtSecret(): string {
 export async function apiKeyAuthPlugin(fastify: FastifyInstance) {
   fastify.decorateRequest("user", undefined);
 
-  fastify.addHook("preHandler", async (request: FastifyRequest, reply: FastifyReply) => {
-    // Skip authentication for public routes
-    const publicRoutes = ["/", "/auth/signup", "/auth/signin"];
-    if (publicRoutes.includes(request.url.split("?")[0]) || request.routeOptions?.url === "/") {
-      return;
-    }
+  fastify.addHook(
+    "preHandler",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      // Skip authentication for public routes
+      const publicRoutes = ["/", "/auth/signup", "/auth/signin"];
+      if (
+        publicRoutes.includes(request.url.split("?")[0]) ||
+        request.routeOptions?.url === "/"
+      ) {
+        return;
+      }
 
-    const accessToken = request.headers["authorization"]?.replace("Bearer ", "") || (request.query as any)?.accessToken;
+      const accessToken =
+        request.cookies?.token ||
+        request.headers["authorization"]?.replace("Bearer ", "") ||
+        (request.query as any)?.accessToken;
 
-    if (!accessToken || typeof accessToken !== "string") {
-      reply.status(401).send({
-        error: "Unauthorized",
-        message: "Missing Access Token. Please provide 'Authorization: Bearer <token>' in request headers or 'accessToken' as a query parameter.",
-      });
-      return;
-    }
-
-    try {
-      // Verify and decode JWT token
-      const decoded = jwt.verify(accessToken, getJwtSecret()) as JwtPayload;
-
-      // Fetch user from database using userId from token
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-      });
-
-      if (!user) {
+      if (!accessToken || typeof accessToken !== "string") {
         reply.status(401).send({
           error: "Unauthorized",
-          message: "User not found.",
+          message: "Missing Access Token.",
         });
         return;
       }
 
-      request.user = user;
-    } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        reply.status(401).send({
-          error: "Unauthorized",
-          message: "Invalid or expired token.",
-        });
-        return;
-      }
+      try {
+        // Verify and decode JWT token
+        const decoded = jwt.verify(accessToken, getJwtSecret()) as JwtPayload;
 
-      fastify.log.error(error);
-      reply.status(500).send({
-        error: "Internal Server Error",
-        message: "An error occurred during authentication.",
-      });
-    }
-  });
+        // Fetch user from database using userId from token
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+        });
+
+        if (!user) {
+          reply.status(401).send({
+            error: "Unauthorized",
+            message: "User not found.",
+          });
+          return;
+        }
+
+        request.user = user;
+      } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+          reply.status(401).send({
+            error: "Unauthorized",
+            message: "Invalid or expired token.",
+          });
+          return;
+        }
+
+        fastify.log.error(error);
+        reply.status(500).send({
+          error: "Internal Server Error",
+          message: "An error occurred during authentication.",
+        });
+      }
+    },
+  );
 }
 
 (apiKeyAuthPlugin as any)[Symbol.for("skip-override")] = true;
-

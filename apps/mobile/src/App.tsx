@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Chat from "./pages/Chat";
+import LinkWhatsApp from "./pages/LinkWhatsApp";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -39,6 +40,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Chat />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/link"
+        element={
+          <ProtectedRoute>
+            <LinkWhatsApp />
           </ProtectedRoute>
         }
       />
