@@ -46,8 +46,8 @@ function setAuthCookie(reply: any, token: string) {
   reply.setCookie(COOKIE_NAME, token, {
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    secure: true,
+    sameSite: "None",
     maxAge: 60 * 60 * 24 * 30,
   });
 }
