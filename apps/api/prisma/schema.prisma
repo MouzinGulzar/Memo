@@ -1,0 +1,139 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  apiKey    String   @unique
+  phone     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  whatsAppSession WhatsAppSession?
+}
+
+model WhatsAppSession {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  creds     String   // Stringified JSON containing credentials
+  keys      String   // Stringified JSON containing session keys
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         String   @id @default(cuid())
+
+  platform   String
+  userPhone  String
+
+  type       String
+
+  text       String?
+
+  storageKey String?
+  mimeType   String?
+
+  rawPayload Json
+
+  processedText    String?
+  processingStatus String   @default("pending")
+
+  intent           String?
+  intentData       Json?
+
+  createdAt  DateTime @default(now())
+}
+
+model MemoryEvent {
+  id              String   @id @default(cuid())
+
+  userPhone       String
+
+  type            String
+
+  title           String?
+
+  content         String
+
+  sourceMessageId String?
+
+  importance      Float?
+
+  metadata        Json?
+
+  createdAt       DateTime @default(now())
+
+  embedding       Unsupported("vector(384)")?
+}
+
+model Task {
+  id              String   @id @default(cuid())
+
+  userPhone       String
+
+  title           String
+
+  status          String   @default("pending")
+
+  sourceMessageId String?
+
+  createdAt       DateTime @default(now())
+
+  completedAt     DateTime?
+}
+
+model Reminder {
+  id            String   @id @default(cuid())
+
+  messageId     String?
+
+  userPhone     String
+
+  title         String
+
+  rawDateText   String
+
+  scheduledAt   DateTime?
+
+  status        String   @default("pending")
+
+  createdAt     DateTime @default(now())
+}
+
+model MemoryEntity {
+  id             String   @id @default(cuid())
+
+  userPhone      String
+
+  entityType     String
+
+  title          String
+
+  canonicalData  Json
+
+  sourceEventId  String?
+
+  createdAt      DateTime @default(now())
+
+  lastUpdatedAt  DateTime @updatedAt
+
+  embedding      Unsupported("vector(384)")?
+}
+
+model ConversationSession {
+  id              String   @id @default(cuid())
+  userPhone       String   @unique
+  workingMemory   Json
+  expiresAt       DateTime
+  updatedAt       DateTime @updatedAt
+}
