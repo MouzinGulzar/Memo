@@ -10,28 +10,27 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  apiKey    String   @unique
-  phone     String   @unique
-  name      String?
-  password  String?
-  createdAt DateTime @default(now())
-
-  whatsAppSession WhatsAppSession?
-  phoneNumbers    UserPhoneNumber[]
+  id              String            @id @default(cuid())
+  apiKey          String            @unique
+  phone           String            @unique
+  name            String?
+  password        String?
+  createdAt       DateTime          @default(now())
   messages        Message[]
+  phoneNumbers    UserPhoneNumber[]
+  whatsAppSession WhatsAppSession?
+  userSkills      UserSkill[]
 }
 
 model WhatsAppSession {
   id        String   @id @default(cuid())
   userId    String   @unique
   phone     String?  @unique
-  creds     String // Stringified JSON containing credentials
-  keys      String // Stringified JSON containing session keys
+  creds     String
+  keys      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserPhoneNumber {
@@ -40,111 +39,116 @@ model UserPhoneNumber {
   phone     String   @unique
   label     String?
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Skill {
+  id                              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key                             String      @unique
+  name                            String
+  shortDescription                String?     @map("short_description")
+  description                     String?
+  category                        String?
+  capabilities                    Json        @default("[]")
+  supportedEntities               Json        @default("[]") @map("supported_entities")
+  memoryCategories                Json        @default("[]") @map("memory_categories")
+  examplePrompts                  Json        @default("[]") @map("example_prompts")
+  sharedMemoryAccess              Boolean     @default(false) @map("shared_memory_access")
+  crossSkillCompatible            Boolean     @default(false) @map("cross_skill_compatible")
+  isEnabled                       Boolean     @default(true) @map("is_enabled")
+  version                         String      @default("1.0")
+  metadata                        Json        @default("{}")
+  createdAt                       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  institutionalMemoryEnabled      Boolean     @default(false) @map("institutional_memory_enabled")
+  historicalReasoningEnabled      Boolean     @default(false) @map("historical_reasoning_enabled")
+  calendarAwarenessEnabled        Boolean     @default(false) @map("calendar_awareness_enabled")
+  conflictDetectionEnabled        Boolean     @default(false) @map("conflict_detection_enabled")
+  relationshipAwareScheduling     Boolean     @default(false) @map("relationship_aware_scheduling")
+  relationshipTimelineEnabled     Boolean     @default(false) @map("relationship_timeline_enabled")
+  historicalInteractionTracking   Boolean     @default(false) @map("historical_interaction_tracking")
+  organizationalContinuityEnabled Boolean     @default(false) @map("organizational_continuity_enabled")
+  workforceAwarenessEnabled       Boolean     @default(false) @map("workforce_awareness_enabled")
+  hiringWorkflowEnabled           Boolean     @default(false) @map("hiring_workflow_enabled")
+  userSkills                      UserSkill[]
+
+  @@map("skills")
+}
+
+model UserSkill {
+  id        String   @id @default(cuid())
+  userId    String
+  skillId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId])
+  @@map("user_skills")
 }
 
 model Message {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  platform  String
-  userPhone String
-
-  type String
-
-  text String?
-
-  storageKey String?
-  mimeType   String?
-
-  rawPayload Json
-
+  id               String   @id @default(cuid())
+  userId           String
+  platform         String
+  userPhone        String
+  type             String
+  text             String?
+  storageKey       String?
+  mimeType         String?
+  rawPayload       Json
   processedText    String?
-  processingStatus String  @default("pending")
-
-  intent     String?
-  intentData Json?
-
-  createdAt DateTime @default(now())
+  processingStatus String   @default("pending")
+  intent           String?
+  intentData       Json?
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MemoryEvent {
-  id String @id @default(cuid())
-
-  userPhone String
-
-  type String
-
-  title String?
-
-  content String
-
+  id              String                 @id @default(cuid())
+  userPhone       String
+  type            String
+  title           String?
+  content         String
   sourceMessageId String?
-
-  importance Float?
-
-  metadata Json?
-
-  createdAt DateTime @default(now())
-
-  embedding Unsupported("vector(384)")?
+  importance      Float?
+  metadata        Json?
+  createdAt       DateTime               @default(now())
+  embedding       Unsupported("vector")?
 }
 
 model Task {
-  id String @id @default(cuid())
-
-  userPhone String
-
-  title String
-
-  status String @default("pending")
-
+  id              String    @id @default(cuid())
+  userPhone       String
+  title           String
+  status          String    @default("pending")
   sourceMessageId String?
-
-  createdAt DateTime @default(now())
-
-  completedAt DateTime?
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
 }
 
 model Reminder {
-  id String @id @default(cuid())
-
-  messageId String?
-
-  userPhone String
-
-  title String
-
+  id          String    @id @default(cuid())
+  messageId   String?
+  userPhone   String
+  title       String
   rawDateText String
-
   scheduledAt DateTime?
-
-  status String @default("pending")
-
-  createdAt DateTime @default(now())
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
 }
 
 model MemoryEntity {
-  id String @id @default(cuid())
-
-  userPhone String
-
-  entityType String
-
-  title String
-
+  id            String                 @id @default(cuid())
+  userPhone     String
+  entityType    String
+  title         String
   canonicalData Json
-
   sourceEventId String?
-
-  createdAt DateTime @default(now())
-
-  lastUpdatedAt DateTime @updatedAt
-
-  embedding Unsupported("vector(384)")?
+  createdAt     DateTime               @default(now())
+  lastUpdatedAt DateTime               @updatedAt
+  embedding     Unsupported("vector")?
 }
 
 model ConversationSession {
