@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import { apiKeyAuthPlugin } from "./core/auth/apiKeyAuth.js";
 import { whatsappRoutes } from "./modules/whatsapp/routes.js";
 import { authRoutes } from "./modules/auth/routes.js";
+import { phoneNumberRoutes } from "./modules/phoneNumbers/routes.js";
 import cookie from "@fastify/cookie";
 
 const app = Fastify({
@@ -25,6 +26,9 @@ app.register(authRoutes);
 
 // Register WhatsApp routes
 app.register(whatsappRoutes);
+
+// Register phone number routes
+app.register(phoneNumberRoutes);
 
 app.get("/", async () => {
   return {
