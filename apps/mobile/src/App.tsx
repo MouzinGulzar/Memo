@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppLayout from "./components/AppLayout";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import LinkWhatsApp from "./pages/LinkWhatsApp";
 import PhoneNumbers from "./pages/PhoneNumbers";
@@ -19,13 +20,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/chat" replace /> : <>{children}</>;
+  return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
+}
+
+function HomeRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? (
+    <AppLayout>
+      <Home />
+    </AppLayout>
+  ) : (
+    <Home />
+  );
 }
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/signin" replace />} />
+      <Route path="/" element={<HomeRoute />} />
       <Route
         path="/signin"
         element={

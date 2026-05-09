@@ -57,21 +57,23 @@ export default function LinkWhatsApp() {
             Devices.
           </p>
 
-          <button
-            className="btn-primary"
-            onClick={handleConnect}
-            disabled={connecting || disconnecting}
-          >
-            {connecting ? <span className="spinner" /> : "Generate QR Code"}
-          </button>
+          <div className="link-actions">
+            <button
+              className="btn-primary"
+              onClick={handleConnect}
+              disabled={connecting || disconnecting}
+            >
+              {connecting ? <span className="spinner" /> : "Generate QR Code"}
+            </button>
 
-          <button
-            className="btn-danger"
-            onClick={handleDisconnect}
-            disabled={connecting || disconnecting}
-          >
-            {disconnecting ? <span className="spinner" /> : "Delete Session"}
-          </button>
+            <button
+              className="btn-danger"
+              onClick={handleDisconnect}
+              disabled={connecting || disconnecting}
+            >
+              {disconnecting ? <span className="spinner" /> : "Delete Session"}
+            </button>
+          </div>
 
           {error && (
             <p className="auth-error" style={{ marginTop: 4 }}>

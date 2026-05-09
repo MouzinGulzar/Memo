@@ -19,7 +19,7 @@ export default function SignIn() {
     try {
       const { data } = await signIn(form);
       login(data.user);
-      navigate("/chat");
+      navigate("/");
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data

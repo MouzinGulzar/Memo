@@ -1,5 +1,10 @@
 import api from "./axios";
 
+export interface SkillCapability {
+  key: string;
+  name: string;
+}
+
 export interface Skill {
   id: string;
   key: string;
@@ -7,7 +12,7 @@ export interface Skill {
   shortDescription: string;
   description: string;
   category: string;
-  capabilities: string[];
+  capabilities: SkillCapability[];
   examplePrompts: string[];
   version: string;
 }

@@ -12,7 +12,12 @@ const app = Fastify({
 });
 
 await app.register(cors, {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://memo-cioe.onrender.com/",
+    "https://www.memo-cioe.onrender.com/",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   credentials: true,
 });
