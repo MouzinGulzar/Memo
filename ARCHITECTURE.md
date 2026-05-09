@@ -4,6 +4,106 @@
 
 **Memo** is an intelligent AI-powered personal assistant that operates through WhatsApp. It processes natural language messages, extracts cognitive intent, manages tasks/reminders/notes, stores memories, and provides contextual responses. The system uses a skill-based architecture where users can enable different capabilities (task management, scheduling, note-taking, etc.) dynamically.
 
+### **Available Skills**
+
+Memo offers a comprehensive suite of specialized skills that users can activate based on their needs:
+
+#### 🗓️ **Appointment & Scheduling Manager** (v1.0)
+Intelligent scheduling and coordination system for appointments, meetings, calendar management, and operational time planning.
+
+**Capabilities:**
+- Appointment Booking
+- Calendar Management
+- Rescheduling & Cancellations
+- Availability Coordination
+- Meeting Reminders
+- Time Conflict Detection
+- Relationship-Aware Scheduling
+- Follow-Up Scheduling
+
+**Use Cases:** Schedule client meetings, coordinate team calls, manage personal appointments, detect scheduling conflicts, send automated reminders.
+
+---
+
+#### ⚡ **Business & Operations Assistant** (v1.0)
+Persistent AI-powered operational brain for business owners and teams to manage tasks, reminders, contextual memory, business decisions, client deals, follow-ups, and operational continuity.
+
+**Capabilities:**
+- Business Task Management
+- Smart Reminders & Follow-Ups
+- Business Contextual Memory
+- Client & Deal Tracking
+- Business Decision Tracking
+- Daily Executive Briefings
+- Operational Priority Management
+- Client Scheduling Assistance
+- Operational Context Retrieval
+- Business Workflow Continuity
+
+**Use Cases:** Track ongoing deals, manage client follow-ups, remember business decisions, prioritize operational tasks, maintain business continuity across conversations.
+
+---
+
+#### 🧠 **Business Knowledge Manager** (v1.0)
+Persistent institutional memory system that stores, organizes, and retrieves strategic, operational, and organizational business knowledge.
+
+**Capabilities:**
+- Strategic Memory
+- Decision Tracking
+- Operational Knowledge
+- Business Insights
+- Historical Context Retrieval
+- Organizational Memory
+- Policy & Process Memory
+- Project Knowledge Tracking
+- Idea & Innovation Memory
+
+**Use Cases:** Store company policies, track strategic decisions, remember project details, retrieve historical business context, maintain organizational knowledge base.
+
+---
+
+#### 🤝 **CRM & Relationship Memory** (v1.0)
+Persistent relationship intelligence system for managing customers, vendors, suppliers, partners, and communication history.
+
+**Capabilities:**
+- Contact Memory
+- Communication History
+- Relationship Preferences
+- Follow-Up Management
+- Sales & Negotiation Memory
+- Vendor Behavior Tracking
+- Customer Intelligence
+- Relationship Timeline
+
+**Use Cases:** Remember customer preferences, track vendor negotiations, manage sales pipelines, recall past communications, maintain relationship context.
+
+---
+
+#### 👥 **HR & Team Coordination** (v1.0)
+Lightweight organizational coordination system for managing employees, attendance, hiring, leave tracking, team notes, and workforce continuity.
+
+**Capabilities:**
+- Employee Memory
+- Leave Management
+- Attendance Coordination
+- Hiring & Interview Tracking
+- Employee Follow-Ups
+- Team Notes & Feedback
+- Role & Responsibility Tracking
+- Shift & Workforce Coordination
+
+**Use Cases:** Track employee leave requests, manage hiring pipelines, coordinate team schedules, store employee feedback, maintain workforce records.
+
+---
+
+### **Skill Architecture Benefits**
+
+1. **Modular Design**: Each skill is independent and can be enabled/disabled without affecting others
+2. **Dynamic Behavior**: AI adapts its responses based on active skills
+3. **Specialized Context**: Each skill brings domain-specific knowledge and capabilities
+4. **Scalable**: New skills can be added without modifying core system
+5. **User Control**: Users choose which skills to activate based on their needs
+
 ---
 
 ## 🏗️ High-Level Architecture
@@ -336,18 +436,44 @@ For each action:
 
 ### **Skill**
 - `id` (uuid)
-- `key` (unique) - Skill identifier (e.g., "task_management")
-- `name` - Display name
+- `key` (unique) - Skill identifier (e.g., "task_management", "hr_coordination")
+- `name` - Display name (e.g., "HR & Team Coordination")
 - `description`, `shortDescription`
-- `category` - Skill category
-- `capabilities` (JSON) - List of capabilities
-- `supportedEntities` (JSON) - Entity types (task, reminder, note)
-- `supportedActions` (JSON) - Action types
+- `category` - Skill category (e.g., "Operations", "Human Resources", "Knowledge Management")
+- `capabilities` (JSON) - List of capabilities (e.g., ["Employee Memory", "Leave Management"])
+- `supportedEntities` (JSON) - Entity types (task, reminder, note, employee, client, deal)
+- `supportedActions` (JSON) - Action types (create, update, delete, query)
 - `supportedIntents` (JSON) - Intent types
-- `memoryCategories` (JSON) - Memory categories
+- `memoryCategories` (JSON) - Memory categories (preference, fact, decision, strategic, operational)
 - `triggers` (JSON) - Trigger conditions
-- Feature flags: `calendarAwarenessEnabled`, `conflictDetectionEnabled`, `semanticSearchEnabled`, etc.
+- Feature flags:
+  - `calendarAwarenessEnabled` - Time-based context awareness
+  - `conflictDetectionEnabled` - Scheduling conflict detection
+  - `semanticSearchEnabled` - Vector-based memory retrieval
+  - `reasoningEnabled` - Advanced reasoning capabilities
+  - `orchestrationEnabled` - Multi-step workflow coordination
+  - `autonomousExecutionEnabled` - Self-initiated actions
+  - `proactiveCapabilitiesEnabled` - Proactive suggestions
+  - `sharedMemoryAccess` - Cross-user memory access
+  - `crossSkillCompatible` - Inter-skill communication
+  - `institutionalMemoryEnabled` - Organizational knowledge retention
+  - `historicalReasoningEnabled` - Historical context analysis
+  - `relationshipTimelineEnabled` - Relationship history tracking
+  - `historicalInteractionTracking` - Communication history
+  - `organizationalContinuityEnabled` - Business continuity
+  - `workforceAwarenessEnabled` - Team/employee awareness
+  - `hiringWorkflowEnabled` - Recruitment process management
+  - `relationshipAwareScheduling` - Context-aware scheduling
 - `isEnabled` - Active/inactive status
+- `version` - Skill version (e.g., "1.0")
+- `metadata` (JSON) - Additional configuration
+
+**Example Skills:**
+1. **Appointment & Scheduling Manager**: Calendar management, conflict detection, relationship-aware scheduling
+2. **Business & Operations Assistant**: Task management, deal tracking, operational continuity
+3. **Business Knowledge Manager**: Strategic memory, decision tracking, institutional knowledge
+4. **CRM & Relationship Memory**: Contact management, communication history, relationship intelligence
+5. **HR & Team Coordination**: Employee management, leave tracking, hiring workflows
 
 ### **UserSkill**
 - `id` (cuid)
@@ -376,13 +502,18 @@ For each action:
 - `id` (cuid)
 - `userId` (FK to User)
 - `userPhone` - Associated phone number
-- `type` - "task", "reminder", "note", "follow_up", "appointment"
+- `type` - Action type based on active skills:
+  - **General**: "task", "reminder", "note", "follow_up"
+  - **Scheduling**: "appointment", "meeting", "calendar_event"
+  - **Business**: "deal", "client_task", "business_decision"
+  - **HR**: "leave_request", "interview", "employee_note", "attendance"
+  - **CRM**: "client_follow_up", "vendor_contact", "sales_activity"
 - `title` - Action title
 - `description` - Detailed description
 - `status` - "pending", "processing", "completed", "failed"
 - `scheduledFor` - Scheduled execution time
 - `sourceMessageId` (FK to Message)
-- `metadata` (JSON) - Additional context
+- `metadata` (JSON) - Additional context (client details, employee info, deal value, etc.)
 - `createdAt`, `completedAt`
 
 ### **MemoryEvent**
@@ -400,9 +531,14 @@ For each action:
 ### **MemoryEntity**
 - `id` (cuid)
 - `userPhone` - Associated phone number
-- `entityType` - "person", "place", "organization", "product", etc.
+- `entityType` - Entity type based on active skills:
+  - **General**: "person", "place", "organization", "product"
+  - **Business**: "client", "vendor", "supplier", "partner", "deal", "project"
+  - **HR**: "employee", "candidate", "team", "department"
+  - **CRM**: "customer", "lead", "prospect", "contact"
+  - **Knowledge**: "policy", "process", "decision", "strategy"
 - `title` - Entity name
-- `canonicalData` (JSON) - Structured entity data
+- `canonicalData` (JSON) - Structured entity data (contact info, preferences, history, etc.)
 - `sourceEventId` (FK to MemoryEvent)
 - `embedding` (vector(384)) - Semantic embedding
 - `createdAt`, `lastUpdatedAt`
@@ -572,14 +708,24 @@ JWT_SECRET=...
 
 ## 🔮 Future Enhancements
 
-1. **Multi-Platform Support**: Telegram, Slack, Discord
+1. **Multi-Platform Support**: Telegram, Slack, Discord, Microsoft Teams integration
 2. **Voice Responses**: Text-to-speech for audio replies
-3. **Image Understanding**: OCR and vision models for image messages
-4. **Proactive Reminders**: AI-driven proactive suggestions
-5. **Collaborative Skills**: Shared skills across teams
-6. **Analytics Dashboard**: User insights and usage metrics
-7. **Mobile/Web App**: Native clients with JWT authentication
-8. **Multi-Language Support**: i18n for global users
+3. **Image Understanding**: OCR and vision models for image messages, document scanning
+4. **Proactive Reminders**: AI-driven proactive suggestions based on patterns and context
+5. **Collaborative Skills**: Shared skills across teams with role-based access control
+6. **Analytics Dashboard**: User insights, usage metrics, productivity analytics
+7. **Mobile/Web App**: Native clients with JWT authentication for cross-platform access
+8. **Multi-Language Support**: i18n for global users with language detection
+9. **Advanced Scheduling**: Calendar integration (Google Calendar, Outlook), meeting link generation
+10. **Email Integration**: Process and respond to emails alongside WhatsApp messages
+11. **Document Generation**: Auto-generate reports, summaries, meeting notes
+12. **Workflow Automation**: Custom workflows and automation rules per skill
+13. **Team Collaboration**: Multi-user workspaces with shared context
+14. **API Marketplace**: Third-party skill development and distribution
+15. **Voice Commands**: Hands-free interaction via voice recognition
+16. **Smart Notifications**: Intelligent notification prioritization and batching
+17. **Data Export**: Export conversations, memories, and actions for compliance
+18. **Advanced Analytics**: Sentiment analysis, productivity insights, relationship health scores
 
 ---
 
@@ -613,14 +759,20 @@ JWT_SECRET=...
 
 ## 🎯 Key Differentiators
 
-1. **Skill-Based Architecture**: Modular, extensible capabilities
-2. **Cognitive Processing**: Advanced AI-driven intent extraction
-3. **Semantic Memory**: Vector-based memory retrieval
+1. **Skill-Based Architecture**: Modular, extensible capabilities that users can enable/disable dynamically
+2. **Cognitive Processing**: Advanced AI-driven intent extraction with context-aware reasoning
+3. **Semantic Memory**: Vector-based memory retrieval for intelligent context recall
 4. **Multi-Phone Support**: Users can receive messages from multiple numbers
-5. **Media Handling**: Audio transcription, image/video storage
-6. **Contextual Awareness**: Deep conversation history and working memory
-7. **Scheduled Actions**: Cron-based reminder execution
-8. **WhatsApp Native**: Seamless integration with WhatsApp Web
+5. **Media Handling**: Audio transcription, image/video storage with future OCR/vision support
+6. **Contextual Awareness**: Deep conversation history and working memory with skill-specific context
+7. **Scheduled Actions**: Cron-based reminder execution with skill-aware notifications
+8. **WhatsApp Native**: Seamless integration with WhatsApp Web for familiar user experience
+9. **Enterprise-Ready Skills**: Specialized capabilities for HR, CRM, Business Operations, Knowledge Management
+10. **Relationship Intelligence**: Tracks and recalls relationships, preferences, and communication history
+11. **Institutional Memory**: Persistent organizational knowledge that survives employee turnover
+12. **Proactive Assistance**: AI can suggest actions, detect conflicts, and provide briefings based on active skills
+13. **Cross-Skill Orchestration**: Skills can work together (e.g., HR + Scheduling for interview coordination)
+14. **Historical Reasoning**: Analyzes past decisions and interactions to provide better recommendations
 
 ---
 
