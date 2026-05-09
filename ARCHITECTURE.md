@@ -274,3 +274,26 @@ Unwrap ephemeral layers → classify type
 | Embeddings       | BAAI/bge-small-en-v1.5 (self-hosted) |
 | Transcription    | faster-whisper (self-hosted, CPU)    |
 | Frontend hosting | Render                               |
+
+---
+
+## 🔮 Future Scope & Scale Roadmap
+
+Given the rapid development timeline of the hackathon, we prioritized high-impact core cognitive layers. Our multi-phase enterprise roadmap details how the system is architected to scale next:
+
+### 1. 🚀 Distributed Background Workflows (BullMQ + Redis)
+To scale past a single server instance, we will transition our current localized `node-cron` model into a distributed, memory-backed job queue utilizing **BullMQ + Redis**.
+- **Impact**: Enables microsecond-precision execution, distributed lock management, durable retry backoff algorithms, parallel worker scaling, and absolute job persistence during high-traffic transactional spikes.
+
+### 2. 📄 Advanced Document Intelligence (OCR & Vision Models)
+Integrate vision-based LLMs (such as Google Gemini Pro Vision) or local OCR pipelines (e.g., Tesseract) to parse and ingest images/documents directly.
+- **Impact**: SMEs can snap a photo of a physical invoice, a purchase order, a tax receipt, or a supplier's business card, and Memo will automatically parse the structural fields, log the financials in PostgreSQL, and attach the record to the appropriate client context automatically.
+
+### 3. 🔍 Semantic Inside-File Deep Searching
+Implement a document processing worker that extracts text from uploaded PDFs, CSVs, Excel sheets, and Word documents in Cloudflare R2 using libraries like `Unstructured` or `PyPDF`.
+- **Impact**: Text will be parsed into chunks, embedded with our SentenceTransformers server, and saved in `pgvector`. Users can then ask semantic questions like *"Search inside the supplier agreement for our cancellation policy"* and retrieve the exact answers instantly.
+
+### 4. 🎙️ Conversational Voice-to-Voice Loop (TTS Integration)
+Integrate premium Text-to-Speech (TTS) models (e.g., ElevenLabs or Google TTS) to allow Memo to reply back to the user with natural, localized audio notes.
+- **Impact**: Busy on-the-road business owners can send voice messages and receive real-time, hands-free vocal briefings, turning Memo into a fully conversational auditory operational partner.
+
