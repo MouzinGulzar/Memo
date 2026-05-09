@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: memo-mobile
+    runtime: static
+    buildCommand: cd apps/mobile && npm install && npm run build
+    staticPublishPath: apps/mobile/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
