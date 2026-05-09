@@ -1,0 +1,135 @@
+.side-nav {
+  width: 240px;
+  height: 100dvh;
+  background: #111b21;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  /* in-flow, not fixed — AppLayout flex handles positioning */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+
+.side-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 20px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #e9edef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.side-nav-logo-icon {
+  font-size: 24px;
+}
+
+.side-nav-links {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+}
+
+.side-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: #8696a0;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.side-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e9edef;
+}
+
+.side-nav-item.active {
+  background: rgba(0, 168, 132, 0.12);
+  color: #00a884;
+}
+
+.side-nav-item svg {
+  flex-shrink: 0;
+}
+
+.side-nav-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.side-nav-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #00a884;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.side-nav-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.side-nav-user-name {
+  color: #e9edef;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-nav-user-phone {
+  color: #8696a0;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-nav-logout {
+  background: none;
+  border: none;
+  color: #8696a0;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.side-nav-logout:hover {
+  color: #f15c6d;
+}

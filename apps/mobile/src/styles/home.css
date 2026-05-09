@@ -1,0 +1,469 @@
+.home {
+  background: #0a1118;
+  color: #e9edef;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.home-accent {
+  color: #00a884;
+}
+
+/* Hero */
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px 48px;
+  gap: 20px;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(0, 168, 132, 0.12) 0%,
+    transparent 70%
+  );
+}
+
+.home-hero-badge {
+  background: rgba(0, 168, 132, 0.12);
+  border: 1px solid rgba(0, 168, 132, 0.3);
+  color: #00a884;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+.home-hero-title {
+  font-size: clamp(36px, 8vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.home-hero-sub {
+  color: #8696a0;
+  font-size: clamp(15px, 2.5vw, 18px);
+  max-width: 520px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.home-hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.home-cta-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: #00a884;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+}
+
+.home-cta-btn:hover {
+  background: #06cf9c;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e9edef;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Phone mock */
+.home-hero-visual {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.home-phone-mock {
+  background: #111b21;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 168, 132, 0.1);
+}
+
+.home-phone-bar {
+  background: #202c33;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e9edef;
+}
+
+.home-phone-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00a884, #06cf9c);
+  flex-shrink: 0;
+}
+
+.home-phone-status {
+  margin-left: auto;
+  color: #00a884;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.home-phone-messages {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-msg {
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.home-msg-in {
+  background: #202c33;
+  color: #e9edef;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.home-msg-out {
+  background: #005c4b;
+  color: #e9edef;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.home-phone-typing {
+  padding: 8px 16px 16px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.home-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8696a0;
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.home-typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.home-typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Sections */
+.home-section {
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.home-section-alt {
+  background: #0d1a20;
+}
+
+.home-section-label {
+  color: #00a884;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.home-section-title {
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  text-align: center;
+  margin: -24px 0 0;
+  max-width: 560px;
+}
+
+/* Features grid */
+.home-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.home-feature-card {
+  background: #111b21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.home-feature-card:hover {
+  border-color: rgba(0, 168, 132, 0.3);
+  transform: translateY(-2px);
+}
+
+.home-feature-icon {
+  font-size: 28px;
+}
+
+.home-feature-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e9edef;
+  margin: 0;
+}
+
+.home-feature-card p {
+  font-size: 14px;
+  color: #8696a0;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Steps */
+.home-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.home-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: #111b21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px 24px;
+}
+
+.home-step-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #00a884;
+  opacity: 0.6;
+  flex-shrink: 0;
+  line-height: 1;
+  min-width: 40px;
+}
+
+.home-step h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e9edef;
+  margin: 0 0 4px;
+}
+
+.home-step p {
+  font-size: 14px;
+  color: #8696a0;
+  margin: 0;
+}
+
+/* Banner */
+.home-banner {
+  background: linear-gradient(135deg, #00a884 0%, #006d5b 100%);
+  padding: 56px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-banner h2 {
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  max-width: 480px;
+}
+
+.home-banner p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  margin: 0;
+}
+
+.home-banner .home-cta-btn {
+  background: #fff;
+  color: #006d5b;
+  margin-top: 8px;
+}
+
+.home-banner .home-cta-btn:hover {
+  background: #e9edef;
+}
+
+/* Footer */
+.home-footer {
+  background: #0a1118;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 24px;
+  text-align: center;
+  color: #8696a0;
+  font-size: 13px;
+}
+
+/* Wide screen adjustments */
+@media (min-width: 768px) {
+  .home-hero {
+    padding: 80px 40px 64px;
+  }
+
+  .home-hero-visual {
+    max-width: 400px;
+  }
+
+  .home-section {
+    padding: 80px 40px;
+  }
+}
+
+/* Skills showcase */
+.home-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.home-skill-card {
+  background: #111b21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.home-skill-card:hover {
+  border-color: rgba(0, 168, 132, 0.3);
+  transform: translateY(-2px);
+}
+
+.home-skill-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-skill-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.home-skill-name {
+  color: #e9edef;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.home-skill-desc {
+  color: #8696a0;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.home-skill-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.home-skill-cap {
+  background: rgba(0, 168, 132, 0.08);
+  border: 1px solid rgba(0, 168, 132, 0.2);
+  color: #00a884;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+@media (min-width: 640px) {
+  .home-skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .home-skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

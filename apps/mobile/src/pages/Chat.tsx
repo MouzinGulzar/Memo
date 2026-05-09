@@ -2,6 +2,27 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/chat.css";
 
+const quickLinks = [
+  {
+    label: "Link WhatsApp",
+    desc: "Connect your number to go live",
+    to: "/link",
+    icon: "📱",
+  },
+  {
+    label: "Phone Numbers",
+    desc: "Manage who your AI responds to",
+    to: "/phones",
+    icon: "📞",
+  },
+  {
+    label: "Skills",
+    desc: "Enable capabilities for your AI",
+    to: "/skills",
+    icon: "⚡",
+  },
+];
+
 export default function Chat() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +42,11 @@ export default function Chat() {
             <div className="chat-header-status">{user?.phone}</div>
           </div>
         </div>
-        <button className="icon-btn" onClick={handleLogout} title="Logout">
+        <button
+          className="icon-btn chat-logout-mobile"
+          onClick={handleLogout}
+          title="Logout"
+        >
           <svg
             width="20"
             height="20"
@@ -37,10 +62,52 @@ export default function Chat() {
         </button>
       </header>
 
-      <div className="chat-empty">
-        <div className="chat-empty-icon">💬</div>
-        <h2>Welcome, {user?.name}</h2>
-        <p>Your conversations will appear here</p>
+      <div className="chat-dashboard">
+        <div className="chat-welcome">
+          <div className="chat-welcome-icon">🤖</div>
+          <h2>Your AI employee is ready</h2>
+          <p>
+            Complete the setup below to start handling customers on WhatsApp
+            automatically.
+          </p>
+        </div>
+
+        <div className="chat-quick-links">
+          {quickLinks.map((item) => (
+            <button
+              key={item.to}
+              className="chat-quick-card"
+              onClick={() => navigate(item.to)}
+            >
+              <span className="chat-quick-icon">{item.icon}</span>
+              <div className="chat-quick-info">
+                <span className="chat-quick-label">{item.label}</span>
+                <span className="chat-quick-desc">{item.desc}</span>
+              </div>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="chat-quick-arrow"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          ))}
+        </div>
+
+        <div className="chat-status-card">
+          <div className="chat-status-dot" />
+          <div>
+            <div className="chat-status-title">Conversations</div>
+            <div className="chat-status-sub">
+              Messages handled by your AI will appear here
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

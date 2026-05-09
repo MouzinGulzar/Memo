@@ -1,0 +1,35 @@
+.app-layout {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.app-sidebar {
+  display: none;
+}
+
+.app-bottom-nav {
+  display: block;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 60px;
+}
+
+@media (min-width: 768px) {
+  .app-sidebar {
+    display: block;
+    width: 240px;
+    flex-shrink: 0;
+  }
+
+  .app-bottom-nav {
+    display: none;
+  }
+
+  /* No margin-left — sidebar is in flow, not fixed */
+  .app-main {
+    padding-bottom: 0;
+  }
+}

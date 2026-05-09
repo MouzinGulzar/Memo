@@ -3,7 +3,7 @@ import "./BottomNav.css";
 
 const tabs = [
   {
-    to: "/chat",
+    to: "/",
     label: "Home",
     icon: (
       <svg

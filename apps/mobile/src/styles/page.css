@@ -1,15 +1,15 @@
 @import "./auth.css";
 
 .page-screen {
-  min-height: calc(100dvh - 60px);
-  background: #111b21;
+  min-height: 100dvh;
+  background: #0d1117;
   display: flex;
   flex-direction: column;
 }
 
 .page-header {
-  background: #202c33;
-  padding: 16px 20px;
+  background: #111b21;
+  padding: 20px 24px 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: sticky;
   top: 0;
@@ -18,22 +18,29 @@
 
 .page-header h1 {
   color: #e9edef;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.page-header-sub {
+  color: #8696a0;
+  font-size: 13px;
   margin: 0;
 }
 
 .page-body {
   flex: 1;
-  padding: 16px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 /* Add form */
 .add-form {
-  background: #202c33;
+  background: #111b21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -42,8 +49,8 @@
 }
 
 .add-form input {
-  background: #2a3942;
-  border: 1px solid #2a3942;
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 12px 14px;
   color: #e9edef;
@@ -69,21 +76,29 @@
 
 .list-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
+  gap: 10px;
+  padding: 56px 0;
   color: #8696a0;
   font-size: 14px;
 }
 
 .list-item {
-  background: #202c33;
+  background: #111b21;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  transition: border-color 0.15s;
+}
+
+.list-item:hover {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .list-item-info {
@@ -114,7 +129,7 @@
 .delete-btn {
   background: none;
   border: none;
-  color: #8696a0;
+  color: #3b4a54;
   cursor: pointer;
   padding: 6px;
   border-radius: 8px;
@@ -122,65 +137,20 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .delete-btn:hover {
   color: #f15c6d;
+  background: rgba(241, 92, 109, 0.08);
 }
 
-/* Skills */
-.skill-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.skill-group-label {
-  color: #8696a0;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0 4px;
-}
-
-.skill-item.skill-active {
-  border: 1px solid rgba(0, 168, 132, 0.3);
-}
-
-.toggle-btn {
-  background: #2a3942;
-  border: none;
-  color: #8696a0;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  flex-shrink: 0;
-  min-width: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    background 0.15s,
-    color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.toggle-btn.toggle-on {
-  background: rgba(0, 168, 132, 0.15);
-  color: #00a884;
-}
-
-.spinner-sm {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  display: inline-block;
+@media (min-width: 768px) {
+  .page-body {
+    padding: 24px;
+    max-width: 720px;
+  }
 }

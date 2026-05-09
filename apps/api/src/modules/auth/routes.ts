@@ -47,7 +47,7 @@ function setAuthCookie(reply: any, token: string) {
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 60 * 60 * 24 * 30,
   });
 }
@@ -137,10 +137,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
     }
 
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password,
-    );
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return reply.status(401).send({
