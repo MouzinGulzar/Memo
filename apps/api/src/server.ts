@@ -1,6 +1,8 @@
 import Fastify from "fastify";
 import { apiKeyAuthPlugin } from "./core/auth/apiKeyAuth.js";
 import { whatsappRoutes } from "./modules/whatsapp/routes.js";
+import { authRoutes } from "./modules/auth/routes.js";
+import cookie from "@fastify/cookie";
 
 const app = Fastify({
   logger: true,
@@ -8,6 +10,12 @@ const app = Fastify({
 
 // Register API Key authentication middleware
 app.register(apiKeyAuthPlugin);
+
+await app.register(cookie, {
+  secret: process.env.JWT_SECRET,
+});
+// Register auth routes (public)
+app.register(authRoutes);
 
 // Register WhatsApp routes
 app.register(whatsappRoutes);

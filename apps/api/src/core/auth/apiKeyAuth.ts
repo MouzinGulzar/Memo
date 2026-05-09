@@ -12,8 +12,9 @@ export async function apiKeyAuthPlugin(fastify: FastifyInstance) {
   fastify.decorateRequest("user", undefined);
 
   fastify.addHook("preHandler", async (request: FastifyRequest, reply: FastifyReply) => {
-    // Skip authentication for the root/healthcheck path
-    if (request.url === "/" || request.routeOptions?.url === "/") {
+    // Skip authentication for public routes
+    const publicRoutes = ["/", "/auth/signup", "/auth/signin"];
+    if (publicRoutes.includes(request.url.split("?")[0]) || request.routeOptions?.url === "/") {
       return;
     }
 
