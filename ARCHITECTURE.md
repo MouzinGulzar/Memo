@@ -76,10 +76,10 @@
 │  ┌─────────────────────────────────────────────────▼─────────────┐  │
 │  │                    Autonomous Execution Layer                  │  │
 │  │                                                               │  │
-│  │   node-cron scheduler  ·  BullMQ + Redis queue                │  │
+│  │   node-cron scheduler (polls pending reminders every minute)  │  │
 │  │   · Polls pending scheduled actions every minute              │  │
 │  │   · Fires WhatsApp reminders at scheduled time                │  │
-│  │   · Handles retries and failure states                        │  │
+│  │   · Handles failure states and status updates                 │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
                                   │
@@ -178,6 +178,14 @@ The data model is a lightweight knowledge graph:
 
 Over time, this builds a rich, queryable model of the business's world — customers, their history, their relationships, their context.
 
+### 9. Intelligent Timezone Localization (IST / Asia/Kolkata)
+
+To eliminate relative date confusion (e.g. "tomorrow at 11 AM") caused by servers running in UTC, Memo natively parses system dates and schedules in the user's active timezone (`Asia/Kolkata`). Every context package and fallback formatting layer converts timestamps to local Indian Standard Time (IST) dynamically.
+
+### 10. Live Google Search Grounding & Web Research
+
+During dynamic list rendering and list query synthesis, Memo utilizes live **Google Search Grounding**. This allows the assistant to answer questions requiring real-time market data, competitor pricing benchmarks, or SaaS strategies on the fly and merge discoveries directly with the local database context.
+
 ---
 
 ## Data Flow: Message to Action
@@ -261,7 +269,7 @@ Unwrap ephemeral layers → classify type
 | Database         | Neon (PostgreSQL, serverless)        |
 | Vector search    | pgvector extension                   |
 | Media storage    | Cloudflare R2                        |
-| Cache / Queue    | Redis + BullMQ                       |
+| Cron Scheduling  | node-cron                            |
 | AI               | Google Gemini 2.5 Flash              |
 | Embeddings       | BAAI/bge-small-en-v1.5 (self-hosted) |
 | Transcription    | faster-whisper (self-hosted, CPU)    |
