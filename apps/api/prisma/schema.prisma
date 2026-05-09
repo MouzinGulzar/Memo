@@ -17,16 +17,17 @@ model User {
   password  String?
   createdAt DateTime @default(now())
 
-  whatsAppSession  WhatsAppSession?
-  phoneNumbers     UserPhoneNumber[]
+  whatsAppSession WhatsAppSession?
+  phoneNumbers    UserPhoneNumber[]
+  messages        Message[]
 }
 
 model WhatsAppSession {
   id        String   @id @default(cuid())
   userId    String   @unique
   phone     String?  @unique
-  creds     String   // Stringified JSON containing credentials
-  keys      String   // Stringified JSON containing session keys
+  creds     String // Stringified JSON containing credentials
+  keys      String // Stringified JSON containing session keys
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -44,14 +45,17 @@ model UserPhoneNumber {
 }
 
 model Message {
-  id         String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  platform   String
-  userPhone  String
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  type       String
+  platform  String
+  userPhone String
 
-  text       String?
+  type String
+
+  text String?
 
   storageKey String?
   mimeType   String?
@@ -59,94 +63,94 @@ model Message {
   rawPayload Json
 
   processedText    String?
-  processingStatus String   @default("pending")
+  processingStatus String  @default("pending")
 
-  intent           String?
-  intentData       Json?
+  intent     String?
+  intentData Json?
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model MemoryEvent {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userPhone       String
+  userPhone String
 
-  type            String
+  type String
 
-  title           String?
+  title String?
 
-  content         String
+  content String
 
   sourceMessageId String?
 
-  importance      Float?
+  importance Float?
 
-  metadata        Json?
+  metadata Json?
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  embedding       Unsupported("vector(384)")?
+  embedding Unsupported("vector(384)")?
 }
 
 model Task {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userPhone       String
+  userPhone String
 
-  title           String
+  title String
 
-  status          String   @default("pending")
+  status String @default("pending")
 
   sourceMessageId String?
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  completedAt     DateTime?
+  completedAt DateTime?
 }
 
 model Reminder {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  messageId     String?
+  messageId String?
 
-  userPhone     String
+  userPhone String
 
-  title         String
+  title String
 
-  rawDateText   String
+  rawDateText String
 
-  scheduledAt   DateTime?
+  scheduledAt DateTime?
 
-  status        String   @default("pending")
+  status String @default("pending")
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model MemoryEntity {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userPhone      String
+  userPhone String
 
-  entityType     String
+  entityType String
 
-  title          String
+  title String
 
-  canonicalData  Json
+  canonicalData Json
 
-  sourceEventId  String?
+  sourceEventId String?
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  lastUpdatedAt  DateTime @updatedAt
+  lastUpdatedAt DateTime @updatedAt
 
-  embedding      Unsupported("vector(384)")?
+  embedding Unsupported("vector(384)")?
 }
 
 model ConversationSession {
-  id              String   @id @default(cuid())
-  userPhone       String   @unique
-  workingMemory   Json
-  expiresAt       DateTime
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userPhone     String   @unique
+  workingMemory Json
+  expiresAt     DateTime
+  updatedAt     DateTime @updatedAt
 }
