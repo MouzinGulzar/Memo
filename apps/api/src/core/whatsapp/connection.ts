@@ -79,6 +79,14 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
 
       if (!dbUser) return;
 
+      const remoteJid = m.key.remoteJid;
+
+      console.log("remoteJid:", remoteJid);
+
+      // Individual chat
+      // Example: 919876543210@s.whatsapp.net
+      const senderNumber = remoteJid?.split("@")[0];
+
       for (const msg of messages) {
         console.log(
           "🔍 [Full Baileys Message Payload]:",
@@ -90,9 +98,9 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
         const isFromMe = msg.key.fromMe;
 
         const isFromUser =
-          senderJid.includes(dbUser.phone) ||
-          senderJidAlt.includes(dbUser.phone) ||
-          participant.includes(dbUser.phone);
+          senderJid.includes(senderNumber) ||
+          senderJidAlt.includes(senderNumber) ||
+          participant.includes(senderNumber);
 
         console.log(
           `   └─ Message details: JID=${senderJid} | JIDAlt=${senderJidAlt} | FromMe=${isFromMe} | IsFromUser=${isFromUser}`,
@@ -191,7 +199,7 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
               userId,
 
               platform: "whatsapp",
-              userPhone: dbUser.phone,
+              userPhone: senderNumber,
               type: messageType,
               text: textContent,
               storageKey,
@@ -204,25 +212,25 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
           // Trigger asynchronous post-ingestion processing using Primary Key
           if (isFromUser) {
             // Instantly start composing typing state so the user sees it immediately!
-            sendWhatsAppPresence(dbUser.phone, "composing").catch(() => {});
+            sendWhatsAppPresence(senderNumber, "composing").catch(() => {});
 
             if (messageType === "text" && textContent) {
-              const existingBatch = userBatches.get(dbUser.phone);
+              const existingBatch = userBatches.get(senderNumber);
               if (existingBatch) {
                 clearTimeout(existingBatch.timer);
                 existingBatch.messageIds.push(savedMessage.id);
                 existingBatch.texts.push(textContent);
               } else {
-                userBatches.set(dbUser.phone, {
+                userBatches.set(senderNumber, {
                   timer: null as any,
                   messageIds: [savedMessage.id],
                   texts: [textContent],
                 });
               }
 
-              const batch = userBatches.get(dbUser.phone)!;
+              const batch = userBatches.get(senderNumber)!;
               batch.timer = setTimeout(async () => {
-                userBatches.delete(dbUser.phone);
+                userBatches.delete(senderNumber);
                 try {
                   const combinedText = batch.texts.join(" ");
                   const primaryMessageId = batch.messageIds[0];
