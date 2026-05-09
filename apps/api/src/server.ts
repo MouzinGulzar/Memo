@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { apiKeyAuthPlugin } from "./core/auth/apiKeyAuth.js";
 import { whatsappRoutes } from "./modules/whatsapp/routes.js";
 import { authRoutes } from "./modules/auth/routes.js";
@@ -6,6 +7,11 @@ import cookie from "@fastify/cookie";
 
 const app = Fastify({
   logger: true,
+});
+
+await app.register(cors, {
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  credentials: true,
 });
 
 // Register API Key authentication middleware
@@ -46,11 +52,18 @@ const start = async () => {
     try {
       const { prisma: db } = await import("./core/db/prisma.js");
       const { connectWhatsApp } = await import("./core/whatsapp/connection.js");
-      const sessions = await db.whatsAppSession.findMany({ select: { userId: true } });
-      console.log(`[Startup] Auto-reconnecting ${sessions.length} active WhatsApp session(s)...`);
+      const sessions = await db.whatsAppSession.findMany({
+        select: { userId: true },
+      });
+      console.log(
+        `[Startup] Auto-reconnecting ${sessions.length} active WhatsApp session(s)...`,
+      );
       for (const session of sessions) {
         connectWhatsApp(session.userId).catch((e) => {
-          console.error(`[Startup] Failed to auto-reconnect user ${session.userId}:`, e);
+          console.error(
+            `[Startup] Failed to auto-reconnect user ${session.userId}:`,
+            e,
+          );
         });
       }
     } catch (startupErr) {
@@ -71,4 +84,3 @@ const start = async () => {
 };
 
 start();
-

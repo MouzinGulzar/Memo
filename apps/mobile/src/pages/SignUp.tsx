@@ -1,4 +1,5 @@
-import { useState, FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signUp } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
@@ -17,10 +18,13 @@ export default function SignUp() {
     setLoading(true);
     try {
       const { data } = await signUp(form);
-      login(data.token, data.user);
+      login(data.user);
       navigate("/chat");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong");
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Something went wrong";
+      setError(msg);
     } finally {
       setLoading(false);
     }

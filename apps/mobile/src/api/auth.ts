@@ -11,13 +11,16 @@ export interface SignInPayload {
   password: string;
 }
 
+export interface ApiUser {
+  id: string;
+  name: string;
+  phone: string;
+  apiKey: string;
+  createdAt: string;
+}
+
 export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    phone: string;
-  };
+  user: ApiUser;
 }
 
 export const signUp = (data: SignUpPayload) =>
@@ -25,3 +28,5 @@ export const signUp = (data: SignUpPayload) =>
 
 export const signIn = (data: SignInPayload) =>
   api.post<AuthResponse>("/auth/signin", data);
+
+export const signOut = () => api.post("/auth/logout");

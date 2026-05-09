@@ -1,12 +1,18 @@
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/chat.css";
 
 export default function Chat() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/signin");
+  };
 
   return (
     <div className="chat-shell">
-      {/* Header */}
       <header className="chat-header">
         <div className="chat-header-left">
           <div className="avatar">{user?.name?.[0]?.toUpperCase()}</div>
@@ -15,7 +21,7 @@ export default function Chat() {
             <div className="chat-header-status">online</div>
           </div>
         </div>
-        <button className="icon-btn" onClick={logout} title="Logout">
+        <button className="icon-btn" onClick={handleLogout} title="Logout">
           <svg
             width="20"
             height="20"
@@ -31,7 +37,6 @@ export default function Chat() {
         </button>
       </header>
 
-      {/* Empty state */}
       <div className="chat-empty">
         <div className="chat-empty-icon">💬</div>
         <h2>Welcome, {user?.name}</h2>

@@ -18,10 +18,13 @@ export default function SignIn() {
     setLoading(true);
     try {
       const { data } = await signIn(form);
-      login(data.token, data.user);
+      login(data.user);
       navigate("/chat");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid phone or password");
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Invalid phone or password";
+      setError(msg);
     } finally {
       setLoading(false);
     }
