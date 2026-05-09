@@ -15,7 +15,7 @@ const CognitiveExtractionSchema = z.object({
         operation: z.enum(["create", "update", "delete", "complete", "reopen", "query"]),
         type: z.string(),
         title: z.string().nullable().optional(),
-        resolvedIds: z.array(z.string()).optional().default([]),
+        resolvedIds: z.array(z.string()).nullable().optional().transform((val) => val ?? []),
         scheduledFor: z.string().nullable().optional(),
         query: z.string().nullable().optional(),
         mutations: z.record(z.string(), z.any()).nullable().optional(),
@@ -257,6 +257,7 @@ RULES:
 15. COMPLETION: "done", "completed", "mark as done" → operation="complete", resolve target ID.
 16. ENTITIES: Whenever the user introduces, updates, or mentions people, products, systems, organizations, or key entities, ALWAYS extract them into the "entities" array with their type, name, and any descriptive metadata (e.g. {"description": "..."}). Do not skip extracting entities.
 17. PRONOUN RESOLUTION: If the user uses pronouns or relative terms (e.g., "who is he", "explain this", "delete it", "complete them", "who is this"), you MUST resolve these pronouns using the "repliedToMessage" text as the PRIMARY source of context. If the "repliedToMessage" mentions specific entities (like "Mouzin", "CodeRoad Softwares") and the user asks "And who is this?", they are asking about the entities inside the "repliedToMessage" itself (such as "Mouzin"). You MUST NOT answer about a previous topic (like "Mudasir") if that previous topic is completely absent from the "repliedToMessage". Use "recentConversation" history only as a secondary fallback. For example, if "repliedToMessage" is "Who is mudasir" and the user says "Who is he?", "he" refers to "mudasir".
+18. ACTION MUTATIONS: When creating or updating an action, ALWAYS use the "mutations" object to store any extra descriptive details, context, notes, issues, people involved, or variables from the user's message (e.g. {"description": "details...", "client": "details of client..."}). Do not lose this context. This is crucial for keeping our actions fully descriptive and complete.
 
 ${skillRulesSection ? `ACTIVE SKILLS SPECIFIC EXECUTION RULES:\n${skillRulesSection}` : ""}
 
@@ -278,7 +279,9 @@ Return ONLY valid JSON matching this schema:
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
-    config: { responseMimeType: "application/json" },
+    config: { 
+      responseMimeType: "application/json"
+    },
   });
 
   let rawJson = JSON.parse(response.text || "{}");

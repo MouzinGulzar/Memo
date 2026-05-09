@@ -60,41 +60,35 @@ export async function executeActions(
 async function handleCreate(userId: string, userPhone: string, messageId: string, action: ActionInstruction, wm: WorkingMemory) {
   const actionTitle = action.title || "Untitled";
   const actionType = action.type;
-  let scheduleStr = "";
+  let parsedDate: Date | null = null;
 
-  if (action.type === "reminder" && action.scheduledFor) {
-    const parsedDate = chrono.parseDate(action.scheduledFor) || new Date(action.scheduledFor);
-    scheduleStr = ` scheduled for ${parsedDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}`;
-    await prisma.action.create({
-      data: {
-        userId,
-        userPhone,
-        type: "reminder",
-        title: actionTitle,
-        status: "pending",
-        sourceMessageId: messageId,
-        scheduledFor: parsedDate,
-        payload: action.mutations || {},
-      },
-    });
-    console.log(`⏰ [Action] Created reminder: "${actionTitle}" for ${parsedDate.toISOString()}`);
-  } else {
-    const created = await prisma.action.create({
-      data: {
-        userId,
-        userPhone,
-        type: actionType,
-        title: actionTitle,
-        status: "pending",
-        sourceMessageId: messageId,
-        payload: action.mutations || {},
-      },
-    });
-    console.log(`✅ [Action] Created ${actionType}: "${created.title}"`);
-
-    if (!wm.lastActionList) wm.lastActionList = [];
-    wm.lastActionList.unshift({ id: created.id, title: created.title, type: created.type, status: "pending" });
+  if (action.scheduledFor) {
+    parsedDate = chrono.parseDate(action.scheduledFor) || new Date(action.scheduledFor);
   }
+
+  const created = await prisma.action.create({
+    data: {
+      userId,
+      userPhone,
+      type: actionType,
+      title: actionTitle,
+      status: "pending",
+      sourceMessageId: messageId,
+      scheduledFor: parsedDate || undefined,
+      payload: action.mutations || {},
+    },
+  });
+
+  if (parsedDate) {
+    console.log(`⏰ [Action] Created scheduled ${actionType}: "${actionTitle}" for ${parsedDate.toISOString()}`);
+  } else {
+    console.log(`✅ [Action] Created ${actionType}: "${created.title}"`);
+  }
+
+  if (!wm.lastActionList) wm.lastActionList = [];
+  wm.lastActionList.unshift({ id: created.id, title: created.title, type: created.type, status: "pending" });
+
+  const scheduleStr = parsedDate ? ` scheduled for ${parsedDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}` : "";
 
   // Auto-record action creation into semantic Memory
   await storeMemories(userId, messageId, [{
@@ -194,7 +188,9 @@ async function handleReopen(userId: string, action: ActionInstruction, wm: Worki
 }
 
 async function handleQuery(userId: string, action: ActionInstruction, wm: WorkingMemory): Promise<any> {
-  if (action.type === "task") {
+  const queryType = action.type.toLowerCase();
+
+  if (queryType === "task") {
     const tasks = await prisma.action.findMany({
       where: { userId, type: "task", status: "pending" },
       orderBy: { createdAt: "desc" },
@@ -205,13 +201,22 @@ async function handleQuery(userId: string, action: ActionInstruction, wm: Workin
     return { type: "task_list", items: tasks.map((t, i) => ({ index: i + 1, title: t.title, status: t.status, createdAt: t.createdAt })) };
   }
 
-  if (action.type === "reminder") {
-    const reminders = await prisma.action.findMany({
-      where: { userId, type: "reminder", status: "pending" },
+  if (["reminder", "appointment", "meeting", "demo", "calendar_event"].includes(queryType)) {
+    const targetTypes = queryType === "reminder"
+      ? ["reminder"]
+      : ["appointment", "meeting", "demo", "calendar_event", "reminder"];
+
+    const items = await prisma.action.findMany({
+      where: { userId, type: { in: targetTypes }, status: "pending" },
       orderBy: { scheduledFor: "asc" },
       take: 20,
     });
-    return { type: "reminder_list", items: reminders.map((r, i) => ({ index: i + 1, title: r.title, scheduledFor: r.scheduledFor })) };
+    wm.lastActionList = items.map((t) => ({ id: t.id, title: t.title, type: t.type, status: t.status }));
+    wm.activeTopic = queryType === "reminder" ? "reminders" : "appointments";
+    return {
+      type: queryType === "reminder" ? "reminder_list" : "appointment_list",
+      items: items.map((r, i) => ({ index: i + 1, title: r.title, type: r.type, scheduledFor: r.scheduledFor }))
+    };
   }
 
   // Generic memory/search query — return raw data for response generator
