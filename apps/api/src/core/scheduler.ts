@@ -3,62 +3,62 @@ import { prisma } from "./db/prisma.js";
 import { sendWhatsAppMessage } from "./whatsapp/connection.js";
 
 export function startReminderScheduler() {
-  console.log("⏰ [Scheduler] Starting Reminder Cron Job (runs every minute)...");
+  console.log("⏰ [Scheduler] Starting Action Scheduler (runs every minute)...");
 
   cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
-      
-      // Find all pending reminders due for execution
-      const remindersDue = await prisma.reminder.findMany({
+
+      // Find all pending scheduled actions (reminders, appointments, follow-ups) that are due
+      const actionsDue = await prisma.action.findMany({
         where: {
-          scheduledAt: { lte: now },
+          scheduledFor: { lte: now },
           status: "pending",
         },
+        select: { id: true, userId: true, userPhone: true, type: true, title: true },
       });
 
-      if (remindersDue.length === 0) return;
+      if (actionsDue.length === 0) return;
 
-      console.log(`⏰ [Scheduler] Found ${remindersDue.length} pending reminder(s) due for execution.`);
+      console.log(`⏰ [Scheduler] Found ${actionsDue.length} scheduled action(s) due for execution.`);
 
-      for (const reminder of remindersDue) {
+      for (const action of actionsDue) {
         try {
-          // Lock the reminder to prevent concurrent duplicate execution
-          await prisma.reminder.update({
-            where: { id: reminder.id },
+          await prisma.action.update({
+            where: { id: action.id },
             data: { status: "processing" },
           });
 
-          console.log(`⏰ [Scheduler] Executing reminder ID: ${reminder.id} ("${reminder.title}") for ${reminder.userPhone}...`);
+          if (!action.userPhone) {
+            console.warn(`⏰ [Scheduler] Action ${action.id} has no userPhone, skipping.`);
+            continue;
+          }
 
-          const messageText = `⏰ *Reminder:* ${reminder.title}`;
-          const success = await sendWhatsAppMessage(reminder.userPhone, messageText);
+          console.log(`⏰ [Scheduler] Executing ${action.type}: "${action.title}" for ${action.userPhone}...`);
+
+          const messageText = `⏰ *Reminder:* ${action.title}`;
+          const success = await sendWhatsAppMessage(action.userPhone, messageText);
+
+          await prisma.action.update({
+            where: { id: action.id },
+            data: { status: success ? "completed" : "failed", completedAt: success ? new Date() : undefined },
+          });
 
           if (success) {
-            await prisma.reminder.update({
-              where: { id: reminder.id },
-              data: { status: "completed" },
+            // Store the reminder notification as a conversation event
+            await prisma.conversationEvent.create({
+              data: { userId: action.userId, userPhone: action.userPhone, role: "assistant", message: messageText },
             });
-            console.log(`⏰ [Scheduler] Reminder ID: ${reminder.id} successfully completed!`);
-          } else {
-            await prisma.reminder.update({
-              where: { id: reminder.id },
-              data: { status: "failed" },
-            });
-            console.error(`⏰ [Scheduler] Reminder ID: ${reminder.id} execution failed (WhatsApp send failed).`);
           }
         } catch (execErr) {
-          console.error(`⏰ [Scheduler] Error processing reminder ID: ${reminder.id}:`, execErr);
+          console.error(`⏰ [Scheduler] Error processing action ${action.id}:`, execErr);
           try {
-            await prisma.reminder.update({
-              where: { id: reminder.id },
-              data: { status: "failed" },
-            });
-          } catch (e) {}
+            await prisma.action.update({ where: { id: action.id }, data: { status: "failed" } });
+          } catch {}
         }
       }
     } catch (err) {
-      console.error("⏰ [Scheduler] Critical error in reminder cron job loop:", err);
+      console.error("⏰ [Scheduler] Critical error in scheduler loop:", err);
     }
   });
 }

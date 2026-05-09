@@ -31,6 +31,21 @@ async function main() {
         "project",
         "note"
       ],
+      supportedActions: [
+        "create_task",
+        "create_reminder",
+        "query_tasks",
+        "complete_task",
+        "delete_task",
+        "reopen_task",
+        "update_reminder"
+      ],
+      supportedIntents: [
+        "task_management",
+        "reminders",
+        "productivity_workflow",
+        "working_memory_query"
+      ],
       memoryCategories: [
         "TASK",
         "REMINDER",
@@ -50,20 +65,41 @@ async function main() {
         "Show overdue follow-ups.",
         "Move Friday meeting to Monday.",
         "What did we discuss about pricing last month?",
-        "Give me today’s operational summary."
+        "Give me today’s operational summary.",
+        "Remind me tomorrow at 4 PM to check Mediflux billing.",
+        "Mark the first task as completed.",
+        "Remember that Faisal is our chief pharmacist.",
+        "Show my pending follow-ups."
+      ],
+      executionRules: [
+        "For reminders, if a specific time is not explicitly mentioned, default the scheduling to 9:00 AM on the specified target date.",
+        "Categorize personal habits, likes, dislikes, and conversational preferences under the PREFERENCE category.",
+        "Extract any active commitments, milestones, or strategic targets as GOAL category memories.",
+        "Resolve any task indices or references relative to the active lastActionList in the working memory.",
+        "Always synthesize a clean, natural assistant response indicating action execution or query results transition."
+      ],
+      triggers: [
+        "user says 'remind me'",
+        "user asks 'what do I have pending'",
+        "user says 'remember that'"
       ],
       sharedMemoryAccess: true,
       crossSkillCompatible: true,
       institutionalMemoryEnabled: false,
       historicalReasoningEnabled: false,
       calendarAwarenessEnabled: true,
-      conflictDetectionEnabled: false,
+      conflictDetectionEnabled: true,
       relationshipAwareScheduling: false,
       relationshipTimelineEnabled: false,
       historicalInteractionTracking: false,
       organizationalContinuityEnabled: true,
       workforceAwarenessEnabled: false,
       hiringWorkflowEnabled: false,
+      autonomousExecutionEnabled: false,
+      proactiveCapabilitiesEnabled: true,
+      semanticSearchEnabled: true,
+      reasoningEnabled: true,
+      orchestrationEnabled: true,
       isEnabled: true,
       version: "1.0",
       metadata: {}
@@ -97,6 +133,20 @@ async function main() {
         "idea",
         "market_insight"
       ],
+      supportedActions: [
+        "store_decision",
+        "store_strategy",
+        "query_knowledge",
+        "retrieve_lessons",
+        "add_policy",
+        "add_process"
+      ],
+      supportedIntents: [
+        "institutional_memory",
+        "strategic_planning",
+        "operational_learning",
+        "knowledge_query"
+      ],
       memoryCategories: [
         "DECISION",
         "BUSINESS_STRATEGY",
@@ -116,7 +166,22 @@ async function main() {
         "What pricing strategy did we discuss last month?",
         "Why did we decide against Firebase migration?",
         "Store this supplier negotiation insight.",
-        "What lessons did we learn from the pilot launch?"
+        "What lessons did we learn from the pilot launch?",
+        "Mediflux is our primary pharmacy management system.",
+        "We decided against migrating to Firebase because of local hosting requirements.",
+        "Remember that our pricing strategy is to offer a 10% discount to chronic patients."
+      ],
+      executionRules: [
+        "Always extract business decisions under the DECISION category and include a 'rationale' or context field inside the metadata.",
+        "When the user shares long-term strategic plans or targets, classify them under the BUSINESS_STRATEGY category.",
+        "Store operational instructions, system setups, and workflows under the PROCESS category.",
+        "Store official company guidelines, regulations, and operational restrictions under the POLICY category.",
+        "For system architecture or product designs, always link to the corresponding 'system' or 'product' entity."
+      ],
+      triggers: [
+        "user explains a business decision",
+        "user says 'pricing strategy is'",
+        "user asks 'why did we'"
       ],
       sharedMemoryAccess: true,
       crossSkillCompatible: true,
@@ -130,6 +195,11 @@ async function main() {
       organizationalContinuityEnabled: true,
       workforceAwarenessEnabled: false,
       hiringWorkflowEnabled: false,
+      autonomousExecutionEnabled: false,
+      proactiveCapabilitiesEnabled: false,
+      semanticSearchEnabled: true,
+      reasoningEnabled: true,
+      orchestrationEnabled: true,
       isEnabled: true,
       version: "1.0",
       metadata: {}
@@ -162,6 +232,19 @@ async function main() {
         "interaction",
         "follow_up"
       ],
+      supportedActions: [
+        "add_contact",
+        "track_interaction",
+        "query_relationships",
+        "store_preferences",
+        "log_negotiation"
+      ],
+      supportedIntents: [
+        "relationship_intelligence",
+        "contact_management",
+        "negotiation_history",
+        "customer_query"
+      ],
       memoryCategories: [
         "CONTACT_NOTE",
         "CUSTOMER_PREFERENCE",
@@ -178,7 +261,21 @@ async function main() {
         "What do we know about Arif?",
         "Did supplier respond to our pricing discussion?",
         "Show communication history with Bilal.",
-        "Supplier delays payments frequently."
+        "Supplier delays payments frequently.",
+        "Remember that Mudasir is our lead developer.",
+        "Mudasir prefers communicating via WhatsApp in the evening.",
+        "The Mediflux supplier always delivers on Tuesdays."
+      ],
+      executionRules: [
+        "Always link customer preferences, behaviors, and roles to the corresponding 'person' or 'contact' entity name.",
+        "Store supplier payment patterns and delivery reliability under the SUPPLIER_BEHAVIOR category with descriptive metadata.",
+        "Classify contact communication notes as CONTACT_NOTE and log negotiation terms under NEGOTIATION_NOTE.",
+        "Verify if the contact or person has an existing record using case-insensitive search before linking memories."
+      ],
+      triggers: [
+        "user mentions a client or supplier name",
+        "user says ' Bilal prefers'",
+        "user asks 'what do we know about'"
       ],
       sharedMemoryAccess: true,
       crossSkillCompatible: true,
@@ -192,6 +289,11 @@ async function main() {
       organizationalContinuityEnabled: true,
       workforceAwarenessEnabled: false,
       hiringWorkflowEnabled: false,
+      autonomousExecutionEnabled: false,
+      proactiveCapabilitiesEnabled: true,
+      semanticSearchEnabled: true,
+      reasoningEnabled: true,
+      orchestrationEnabled: true,
       isEnabled: true,
       version: "1.0",
       metadata: {}
@@ -222,6 +324,19 @@ async function main() {
         "employee",
         "follow_up"
       ],
+      supportedActions: [
+        "book_appointment",
+        "reschedule_appointment",
+        "cancel_appointment",
+        "query_calendar",
+        "detect_conflict"
+      ],
+      supportedIntents: [
+        "calendar_booking",
+        "appointment_coordination",
+        "meeting_reschedule",
+        "calendar_query"
+      ],
       memoryCategories: [
         "MEETING_NOTE",
         "SCHEDULE_PREFERENCE",
@@ -236,7 +351,21 @@ async function main() {
         "Move Friday appointment to Monday.",
         "What meetings do I have tomorrow?",
         "Cancel my 4 PM meeting.",
-        "Find a free slot for client onboarding."
+        "Find a free slot for client onboarding.",
+        "Book an appointment with Mudasir tomorrow at 5 PM.",
+        "Reschedule the Friday meeting to Monday at 10 AM.",
+        "Do I have any meetings scheduled for tomorrow?"
+      ],
+      executionRules: [
+        "Only allow booking appointments during default business hours (9:00 AM to 6:00 PM IST). Raise clarification if outside.",
+        "Scan active pendingActions to identify and alert the user to any time conflicts or overlapping scheduling.",
+        "When an appointment is cancelled, change its status to 'cancelled' rather than fully deleting to maintain schedule audit records.",
+        "Store preferred scheduling times or restricted slots under the SCHEDULE_PREFERENCE category."
+      ],
+      triggers: [
+        "user says 'book a meeting'",
+        "user says 'move Friday meeting'",
+        "user asks 'am I free'"
       ],
       sharedMemoryAccess: true,
       crossSkillCompatible: true,
@@ -250,6 +379,11 @@ async function main() {
       organizationalContinuityEnabled: true,
       workforceAwarenessEnabled: false,
       hiringWorkflowEnabled: false,
+      autonomousExecutionEnabled: true,
+      proactiveCapabilitiesEnabled: true,
+      semanticSearchEnabled: true,
+      reasoningEnabled: true,
+      orchestrationEnabled: true,
       isEnabled: true,
       version: "1.0",
       metadata: {}
@@ -280,6 +414,20 @@ async function main() {
         "team",
         "department"
       ],
+      supportedActions: [
+        "add_employee",
+        "request_leave",
+        "log_attendance",
+        "schedule_interview",
+        "update_role",
+        "record_feedback"
+      ],
+      supportedIntents: [
+        "employee_records",
+        "leave_coordination",
+        "candidate_workflow",
+        "attendance_monitoring"
+      ],
       memoryCategories: [
         "EMPLOYEE_NOTE",
         "INTERVIEW_NOTE",
@@ -296,7 +444,21 @@ async function main() {
         "Remind me to interview Bilal on Monday.",
         "What HR tasks are pending?",
         "Show attendance issues this week.",
-        "Remember that Faisal handles supplier coordination."
+        "Remember that Faisal handles supplier coordination.",
+        "Mudasir is on leave tomorrow.",
+        "Schedule an interview with Bilal on Monday at 11 AM.",
+        "Arif is responsible for Mediflux Health OS deployment."
+      ],
+      executionRules: [
+        "Classify employee vacation, sick time, and leaves under LEAVE_RECORD with explicit start/end metadata fields.",
+        "Store hiring candidate evaluations, interview timings, and resumes under the INTERVIEW_NOTE category.",
+        "Log employee responsibility changes, ownership updates, and role descriptions under ROLE_ASSIGNMENT.",
+        "If employee attendance issues or missing shifts are reported, automatically suggest generating a follow-up task."
+      ],
+      triggers: [
+        "user says 'is on leave'",
+        "user says ' interview Faisal'",
+        "user asks 'who is responsible for'"
       ],
       sharedMemoryAccess: true,
       crossSkillCompatible: true,
@@ -310,6 +472,11 @@ async function main() {
       organizationalContinuityEnabled: true,
       workforceAwarenessEnabled: true,
       hiringWorkflowEnabled: true,
+      autonomousExecutionEnabled: false,
+      proactiveCapabilitiesEnabled: true,
+      semanticSearchEnabled: true,
+      reasoningEnabled: true,
+      orchestrationEnabled: true,
       isEnabled: true,
       version: "1.0",
       metadata: {}
@@ -329,8 +496,12 @@ async function main() {
         category: skillData.category,
         capabilities: skillData.capabilities as any,
         supportedEntities: skillData.supportedEntities as any,
+        supportedActions: skillData.supportedActions as any,
+        supportedIntents: skillData.supportedIntents as any,
         memoryCategories: skillData.memoryCategories as any,
         examplePrompts: skillData.examplePrompts as any,
+        executionRules: skillData.executionRules as any,
+        triggers: skillData.triggers as any,
         sharedMemoryAccess: skillData.sharedMemoryAccess,
         crossSkillCompatible: skillData.crossSkillCompatible,
         institutionalMemoryEnabled: skillData.institutionalMemoryEnabled,
@@ -343,6 +514,11 @@ async function main() {
         organizationalContinuityEnabled: skillData.organizationalContinuityEnabled,
         workforceAwarenessEnabled: skillData.workforceAwarenessEnabled,
         hiringWorkflowEnabled: skillData.hiringWorkflowEnabled,
+        autonomousExecutionEnabled: skillData.autonomousExecutionEnabled,
+        proactiveCapabilitiesEnabled: skillData.proactiveCapabilitiesEnabled,
+        semanticSearchEnabled: skillData.semanticSearchEnabled,
+        reasoningEnabled: skillData.reasoningEnabled,
+        orchestrationEnabled: skillData.orchestrationEnabled,
         isEnabled: skillData.isEnabled,
         version: skillData.version,
         metadata: skillData.metadata as any,
@@ -355,8 +531,12 @@ async function main() {
         category: skillData.category,
         capabilities: skillData.capabilities as any,
         supportedEntities: skillData.supportedEntities as any,
+        supportedActions: skillData.supportedActions as any,
+        supportedIntents: skillData.supportedIntents as any,
         memoryCategories: skillData.memoryCategories as any,
         examplePrompts: skillData.examplePrompts as any,
+        executionRules: skillData.executionRules as any,
+        triggers: skillData.triggers as any,
         sharedMemoryAccess: skillData.sharedMemoryAccess,
         crossSkillCompatible: skillData.crossSkillCompatible,
         institutionalMemoryEnabled: skillData.institutionalMemoryEnabled,
@@ -369,6 +549,11 @@ async function main() {
         organizationalContinuityEnabled: skillData.organizationalContinuityEnabled,
         workforceAwarenessEnabled: skillData.workforceAwarenessEnabled,
         hiringWorkflowEnabled: skillData.hiringWorkflowEnabled,
+        autonomousExecutionEnabled: skillData.autonomousExecutionEnabled,
+        proactiveCapabilitiesEnabled: skillData.proactiveCapabilitiesEnabled,
+        semanticSearchEnabled: skillData.semanticSearchEnabled,
+        reasoningEnabled: skillData.reasoningEnabled,
+        orchestrationEnabled: skillData.orchestrationEnabled,
         isEnabled: skillData.isEnabled,
         version: skillData.version,
         metadata: skillData.metadata as any,

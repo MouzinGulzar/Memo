@@ -58,7 +58,7 @@ export async function usePrismaAuthState(userId: string) {
         }
         return data;
       },
-      set: async (data) => {
+      set: async (data: any) => {
         for (const category in data) {
           for (const id in data[category]) {
             const value = data[category][id];

@@ -74,42 +74,29 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
     try {
       const dbUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { phone: true, name: true },
+        select: { phone: true, name: true, phoneNumbers: { select: { phone: true } } },
       });
 
       if (!dbUser) return;
 
-      const remoteJid = m.key.remoteJid;
-
-      console.log("remoteJid:", remoteJid);
-
-      // Individual chat
-      // Example: 919876543210@s.whatsapp.net
-      const senderNumber = remoteJid?.split("@")[0];
+      // All phone numbers registered for this user (from UserPhoneNumber table)
+      const allowedPhones = dbUser.phoneNumbers.map((p) => p.phone);
 
       for (const msg of messages) {
-        console.log(
-          "🔍 [Full Baileys Message Payload]:",
-          JSON.stringify(msg, null, 2),
-        );
         const senderJid = msg.key.remoteJid || "";
         const senderJidAlt = (msg.key as any).remoteJidAlt || "";
         const participant = msg.key.participant || "";
-        const isFromMe = msg.key.fromMe;
+        const participantAlt = (msg.key as any).participantAlt || "";
 
-        const isFromUser =
-          senderJid.includes(senderNumber) ||
-          senderJidAlt.includes(senderNumber) ||
-          participant.includes(senderNumber);
+        // Extract raw phone number from all JID fields
+        const allJidFields = [senderJid, senderJidAlt, participant, participantAlt];
 
-        console.log(
-          `   └─ Message details: JID=${senderJid} | JIDAlt=${senderJidAlt} | FromMe=${isFromMe} | IsFromUser=${isFromUser}`,
+        // Match: check if ANY registered phone number appears in ANY JID field
+        const matchedPhone = allowedPhones.find((phone) =>
+          allJidFields.some((jid) => jid.includes(phone)),
         );
 
-        if (!isFromUser) {
-          console.log(
-            `   └─ Message is not from the user phone number (${dbUser.phone}). Ignoring completely.`,
-          );
+        if (!matchedPhone) {
           continue;
         }
 
@@ -197,9 +184,8 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
           const savedMessage = await prisma.message.create({
             data: {
               userId,
-
               platform: "whatsapp",
-              userPhone: senderNumber,
+              userPhone: matchedPhone,
               type: messageType,
               text: textContent,
               storageKey,
@@ -207,30 +193,28 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
               rawPayload: msg as any,
             },
           });
-          console.log("      └─ DB Save: SUCCESS");
+          console.log(`      └─ DB Save: SUCCESS (${matchedPhone})`);
 
-          // Trigger asynchronous post-ingestion processing using Primary Key
-          if (isFromUser) {
-            // Instantly start composing typing state so the user sees it immediately!
-            sendWhatsAppPresence(senderNumber, "composing").catch(() => {});
+          // Trigger asynchronous post-ingestion processing
+          sendWhatsAppPresence(matchedPhone, "composing").catch(() => {});
 
-            if (messageType === "text" && textContent) {
-              const existingBatch = userBatches.get(senderNumber);
+          if (messageType === "text" && textContent) {
+              const existingBatch = userBatches.get(matchedPhone);
               if (existingBatch) {
                 clearTimeout(existingBatch.timer);
                 existingBatch.messageIds.push(savedMessage.id);
                 existingBatch.texts.push(textContent);
               } else {
-                userBatches.set(senderNumber, {
+                userBatches.set(matchedPhone, {
                   timer: null as any,
                   messageIds: [savedMessage.id],
                   texts: [textContent],
                 });
               }
 
-              const batch = userBatches.get(senderNumber)!;
+              const batch = userBatches.get(matchedPhone)!;
               batch.timer = setTimeout(async () => {
-                userBatches.delete(senderNumber);
+                userBatches.delete(matchedPhone);
                 try {
                   const combinedText = batch.texts.join(" ");
                   const primaryMessageId = batch.messageIds[0];
@@ -246,9 +230,9 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
                     });
                   }
 
-                  const { extractIntent } = await import("../intent.js");
-                  extractIntent(primaryMessageId, combinedText).catch((err) => {
-                    console.error("🤖 [AI] Intent trigger failed:", err);
+                  const { processCognitiveEvent } = await import("../cognitive/processor.js");
+                  processCognitiveEvent(primaryMessageId, combinedText).catch((err) => {
+                    console.error("🤖 [Cognitive] Pipeline trigger failed:", err);
                   });
                 } catch (batchErr) {
                   console.error("Error executing batched messages:", batchErr);
@@ -263,7 +247,6 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
                 },
               );
             }
-          }
         } catch (dbErr) {
           console.error("      └─ DB Save: FAILED:", dbErr);
         }
@@ -377,27 +360,50 @@ export async function disconnectWhatsApp(userId: string): Promise<boolean> {
   return removed;
 }
 
+export function formatForWhatsApp(text: string): string {
+  if (!text) return text;
+
+  let formatted = text;
+
+  // 1. Convert markdown headers like ### Header, ## Header to *Header*
+  formatted = formatted.replace(/^(?:#{1,6})\s+(.+)$/gm, "*$1*");
+
+  // 2. Convert markdown bold **text** to *text*
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, "*$1*");
+
+  // 3. Shift trailing punctuation like colons, periods, commas outside the WhatsApp bold asterisks
+  formatted = formatted.replace(/\*([^*]+?)([:.,?!;]+)\*/g, "*$1*$2");
+
+  // 4. Convert asterisk bullets "* " to unicode bullet "• " to prevent broken WhatsApp bold blocks
+  formatted = formatted.replace(/^\s*\*\s+/gm, "• ");
+
+  // 5. Clean up duplicate consecutive asterisks if any remain
+  formatted = formatted.replace(/\*\*\*/g, "*");
+
+  return formatted;
+}
+
 export async function sendWhatsAppMessage(
   userPhone: string,
   text: string,
 ): Promise<boolean> {
   try {
-    const user = await prisma.user.findFirst({
+    const phoneRecord = await prisma.userPhoneNumber.findUnique({
       where: { phone: userPhone },
-      select: { id: true },
+      select: { userId: true },
     });
 
-    if (!user) {
+    if (!phoneRecord) {
       console.warn(
         `[WA Message] No user found with phone number: ${userPhone}`,
       );
       return false;
     }
 
-    const connection = activeConnections.get(user.id);
+    const connection = activeConnections.get(phoneRecord.userId);
     if (!connection || !connection.socket) {
       console.warn(
-        `[WA Message] No active WhatsApp connection found for user ID: ${user.id}`,
+        `[WA Message] No active WhatsApp connection found for user: ${phoneRecord.userId}`,
       );
       return false;
     }
@@ -426,8 +432,9 @@ export async function sendWhatsAppMessage(
       );
     }
 
-    console.log(`[WA Message] Sending message to ${targetJid}: "${text}"...`);
-    await connection.socket.sendMessage(targetJid, { text });
+    const formattedText = formatForWhatsApp(text);
+    console.log(`[WA Message] Sending message to ${targetJid}: "${formattedText}"...`);
+    await connection.socket.sendMessage(targetJid, { text: formattedText });
     console.log(`[WA Message] Message sent successfully!`);
     return true;
   } catch (err) {
@@ -441,14 +448,14 @@ export async function sendWhatsAppPresence(
   state: "composing" | "paused",
 ): Promise<boolean> {
   try {
-    const user = await prisma.user.findFirst({
+    const phoneRecord = await prisma.userPhoneNumber.findUnique({
       where: { phone: userPhone },
-      select: { id: true },
+      select: { userId: true },
     });
 
-    if (!user) return false;
+    if (!phoneRecord) return false;
 
-    const connection = activeConnections.get(user.id);
+    const connection = activeConnections.get(phoneRecord.userId);
     if (!connection || !connection.socket) return false;
 
     let targetJid = userPhone.includes("@")

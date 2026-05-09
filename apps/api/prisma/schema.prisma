@@ -10,16 +10,22 @@ datasource db {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  apiKey          String            @unique
-  phone           String            @unique
+  id              String              @id @default(cuid())
+  apiKey          String              @unique
+  phone           String              @unique
   name            String?
   password        String?
-  createdAt       DateTime          @default(now())
+  createdAt       DateTime            @default(now())
   messages        Message[]
   phoneNumbers    UserPhoneNumber[]
   whatsAppSession WhatsAppSession?
   userSkills      UserSkill[]
+  entities        Entity[]
+  memories        Memory[]
+  relationships   Relationship[]
+  actions         Action[]
+  conversationEvents ConversationEvent[]
+  cognitiveSessions CognitiveSession[]
 }
 
 model WhatsAppSession {
@@ -156,76 +162,102 @@ model Message {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Universal node: person, task, reminder, project, organization, etc.
 model Entity {
-  id String @id @default(cuid())
-
-  type String
-  name String?
-
-  metadata Json?
-
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  name      String?
+  metadata  Json?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  embedding Unsupported("vector(384)")?
+
+  @@index([userId, type])
+  @@index([userId])
 }
 
+// Universal cognitive storage: preferences, decisions, notes, context
 model Memory {
-  id String @id @default(cuid())
-
-  entityId String?
-
-  category String
-
-  content String
-
-  embedding Unsupported("vector")?
-
-  metadata Json?
-
+  id              String   @id @default(cuid())
+  userId          String
+  entityId        String?
+  category        String
+  content         String
+  sourceMessageId String?
   importanceScore Float?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
+  embedding Unsupported("vector(384)")?
+
+  @@index([userId, category])
+  @@index([userId])
 }
 
+// Graph edges between entities
 model Relationship {
-  id String @id @default(cuid())
-
+  id           String   @id @default(cuid())
+  userId       String
   fromEntityId String
   toEntityId   String
-
   relationship String
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  metadata Json?
-
-  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([fromEntityId])
+  @@index([toEntityId])
 }
 
+// Universal operations: tasks, reminders, follow-ups, appointments
 model Action {
-  id String @id @default(cuid())
+  id              String    @id @default(cuid())
+  userId          String
+  userPhone       String?
+  type            String
+  title           String
+  status          String    @default("pending")
+  entityId        String?
+  sourceMessageId String?
+  payload         Json?
+  scheduledFor    DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  type String
-
-  status String
-
-  entityId String?
-
-  payload Json
-
-  scheduledFor DateTime?
-
-  completedAt DateTime?
-
-  createdAt DateTime @default(now())
+  @@index([userId, type, status])
+  @@index([userId, status])
+  @@index([scheduledFor, status])
 }
 
+// Interaction timeline for conversation context
 model ConversationEvent {
-  id String @id @default(cuid())
-
-  sessionId String
-
-  role String
-
-  message String
-
+  id            String   @id @default(cuid())
+  userId        String
+  userPhone     String
+  role          String
+  message       String
   extractedData Json?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+  @@index([userPhone, createdAt])
+}
+
+// Short-term working memory per phone conversation
+model CognitiveSession {
+  id            String   @id @default(cuid())
+  userId        String
+  userPhone     String   @unique
+  workingMemory Json
+  expiresAt     DateTime
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -58,9 +58,9 @@ export async function transcribeAudio(messageId: string, audioBuffer: Buffer, ex
       });
 
       // Trigger Intent Extraction asynchronously for transcribed voice notes using the unique DB ID
-      const { extractIntent } = await import("./intent.js");
-      extractIntent(messageId, transcript).catch((err) => {
-        console.error("🤖 [AI] Intent trigger failed:", err);
+      const { processCognitiveEvent } = await import("./cognitive/processor.js");
+      processCognitiveEvent(messageId, transcript).catch((err) => {
+        console.error("🤖 [Cognitive] Pipeline trigger failed:", err);
       });
     } catch (dbErr) {
       console.error(`🔊 [Whisper] DB Update failed for transcript of message ${messageId}:`, dbErr);
