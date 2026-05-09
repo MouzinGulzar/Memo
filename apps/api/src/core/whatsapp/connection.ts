@@ -83,6 +83,13 @@ export async function connectWhatsApp(userId: string): Promise<WhatsAppClient> {
       const allowedPhones = dbUser.phoneNumbers.map((p) => p.phone);
 
       for (const msg of messages) {
+        // CRITICAL: Ignore messages sent BY the bot (fromMe = true)
+        // This prevents infinite loops where bot processes its own responses
+        if (msg.key.fromMe) {
+          console.log(`      └─ Skipping outgoing message (fromMe=true)`);
+          continue;
+        }
+
         const senderJid = msg.key.remoteJid || "";
         const senderJidAlt = (msg.key as any).remoteJidAlt || "";
         const participant = msg.key.participant || "";
