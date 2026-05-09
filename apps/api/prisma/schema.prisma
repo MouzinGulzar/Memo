@@ -25,7 +25,7 @@ model User {
 model WhatsAppSession {
   id        String   @id @default(cuid())
   userId    String   @unique
-  phone     String?  
+  phone     String?
   creds     String
   keys      String
   createdAt DateTime @default(now())
@@ -43,35 +43,86 @@ model UserPhoneNumber {
 }
 
 model Skill {
-  id                              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  key                             String      @unique
-  name                            String
-  shortDescription                String?     @map("short_description")
-  description                     String?
-  category                        String?
-  capabilities                    Json        @default("[]")
-  supportedEntities               Json        @default("[]") @map("supported_entities")
-  memoryCategories                Json        @default("[]") @map("memory_categories")
-  examplePrompts                  Json        @default("[]") @map("example_prompts")
-  sharedMemoryAccess              Boolean     @default(false) @map("shared_memory_access")
-  crossSkillCompatible            Boolean     @default(false) @map("cross_skill_compatible")
-  isEnabled                       Boolean     @default(true) @map("is_enabled")
-  version                         String      @default("1.0")
-  metadata                        Json        @default("{}")
-  createdAt                       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
-  institutionalMemoryEnabled      Boolean     @default(false) @map("institutional_memory_enabled")
-  historicalReasoningEnabled      Boolean     @default(false) @map("historical_reasoning_enabled")
-  calendarAwarenessEnabled        Boolean     @default(false) @map("calendar_awareness_enabled")
-  conflictDetectionEnabled        Boolean     @default(false) @map("conflict_detection_enabled")
-  relationshipAwareScheduling     Boolean     @default(false) @map("relationship_aware_scheduling")
-  relationshipTimelineEnabled     Boolean     @default(false) @map("relationship_timeline_enabled")
-  historicalInteractionTracking   Boolean     @default(false) @map("historical_interaction_tracking")
-  organizationalContinuityEnabled Boolean     @default(false) @map("organizational_continuity_enabled")
-  workforceAwarenessEnabled       Boolean     @default(false) @map("workforce_awareness_enabled")
-  hiringWorkflowEnabled           Boolean     @default(false) @map("hiring_workflow_enabled")
-  userSkills                      UserSkill[]
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
+  key  String @unique
+  name String
+
+  shortDescription String? @map("short_description")
+  description      String?
+
+  category String?
+
+  capabilities Json @default("[]")
+
+  supportedEntities Json @default("[]") @map("supported_entities")
+
+  memoryCategories Json @default("[]") @map("memory_categories")
+
+  supportedActions Json @default("[]") @map("supported_actions")
+
+  supportedIntents Json @default("[]") @map("supported_intents")
+
+  examplePrompts Json @default("[]") @map("example_prompts")
+
+  triggers Json @default("[]")
+
+  executionRules Json @default("{}") @map("execution_rules")
+
+  metadata Json @default("{}")
+
+  priority Int @default(0)
+
+  isCoreSkill Boolean @default(false) @map("is_core_skill")
+
+  sharedMemoryAccess Boolean @default(false) @map("shared_memory_access")
+
+  crossSkillCompatible Boolean @default(false) @map("cross_skill_compatible")
+
+  institutionalMemoryEnabled Boolean @default(false) @map("institutional_memory_enabled")
+
+  historicalReasoningEnabled Boolean @default(false) @map("historical_reasoning_enabled")
+
+  calendarAwarenessEnabled Boolean @default(false) @map("calendar_awareness_enabled")
+
+  conflictDetectionEnabled Boolean @default(false) @map("conflict_detection_enabled")
+
+  relationshipAwareScheduling Boolean @default(false) @map("relationship_aware_scheduling")
+
+  relationshipTimelineEnabled Boolean @default(false) @map("relationship_timeline_enabled")
+
+  historicalInteractionTracking Boolean @default(false) @map("historical_interaction_tracking")
+
+  organizationalContinuityEnabled Boolean @default(false) @map("organizational_continuity_enabled")
+
+  workforceAwarenessEnabled Boolean @default(false) @map("workforce_awareness_enabled")
+
+  hiringWorkflowEnabled Boolean @default(false) @map("hiring_workflow_enabled")
+
+  autonomousExecutionEnabled Boolean @default(false) @map("autonomous_execution_enabled")
+
+  proactiveCapabilitiesEnabled Boolean @default(false) @map("proactive_capabilities_enabled")
+
+  semanticSearchEnabled Boolean @default(false) @map("semantic_search_enabled")
+
+  reasoningEnabled Boolean @default(false) @map("reasoning_enabled")
+
+  orchestrationEnabled Boolean @default(true) @map("orchestration_enabled")
+
+  isEnabled Boolean @default(true) @map("is_enabled")
+
+  version String @default("1.0")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  userSkills UserSkill[]
+
+  @@index([category])
+  @@index([key])
+  @@index([isEnabled])
+  @@index([priority])
   @@map("skills")
 }
 
@@ -105,56 +156,76 @@ model Message {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model MemoryEvent {
-  id              String                 @id @default(cuid())
-  userPhone       String
-  type            String
-  title           String?
-  content         String
-  sourceMessageId String?
-  importance      Float?
-  metadata        Json?
-  createdAt       DateTime               @default(now())
-  embedding       Unsupported("vector")?
+model Entity {
+  id String @id @default(cuid())
+
+  type String
+  name String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
 }
 
-model Task {
-  id              String    @id @default(cuid())
-  userPhone       String
-  title           String
-  status          String    @default("pending")
-  sourceMessageId String?
-  createdAt       DateTime  @default(now())
-  completedAt     DateTime?
+model Memory {
+  id String @id @default(cuid())
+
+  entityId String?
+
+  category String
+
+  content String
+
+  embedding Unsupported("vector")?
+
+  metadata Json?
+
+  importanceScore Float?
+
+  createdAt DateTime @default(now())
 }
 
-model Reminder {
-  id          String    @id @default(cuid())
-  messageId   String?
-  userPhone   String
-  title       String
-  rawDateText String
-  scheduledAt DateTime?
-  status      String    @default("pending")
-  createdAt   DateTime  @default(now())
+model Relationship {
+  id String @id @default(cuid())
+
+  fromEntityId String
+  toEntityId   String
+
+  relationship String
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
 }
 
-model MemoryEntity {
-  id            String                 @id @default(cuid())
-  userPhone     String
-  entityType    String
-  title         String
-  canonicalData Json
-  sourceEventId String?
-  createdAt     DateTime               @default(now())
-  lastUpdatedAt DateTime               @updatedAt
-  embedding     Unsupported("vector")?
+model Action {
+  id String @id @default(cuid())
+
+  type String
+
+  status String
+
+  entityId String?
+
+  payload Json
+
+  scheduledFor DateTime?
+
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
 }
 
-model ConversationSession {
-  id            String   @id @default(cuid())
-  userPhone     String   @unique
-  workingMemory Json
-  expiresAt     DateTime
-  updatedAt     DateTime @updatedAt
+model ConversationEvent {
+  id String @id @default(cuid())
+
+  sessionId String
+
+  role String
+
+  message String
+
+  extractedData Json?
+
+  createdAt DateTime @default(now())
 }
