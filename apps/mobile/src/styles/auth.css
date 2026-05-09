@@ -1,0 +1,144 @@
+/* Auth screens */
+.auth-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111b21;
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: #202c33;
+  border-radius: 16px;
+  padding: 32px 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.auth-logo h1 {
+  color: #e9edef;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.auth-logo p {
+  color: #8696a0;
+  font-size: 14px;
+  margin: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  color: #8696a0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.field input {
+  background: #2a3942;
+  border: 1px solid #2a3942;
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #e9edef;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.field input::placeholder {
+  color: #3b4a54;
+}
+
+.field input:focus {
+  border-color: #00a884;
+}
+
+.auth-error {
+  color: #f15c6d;
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(241, 92, 109, 0.1);
+  border-radius: 8px;
+}
+
+.btn-primary {
+  background: #00a884;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #06cf9c;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.auth-switch {
+  text-align: center;
+  color: #8696a0;
+  font-size: 14px;
+  margin: 20px 0 0;
+}
+
+.auth-switch a {
+  color: #00a884;
+  text-decoration: none;
+  font-weight: 600;
+}

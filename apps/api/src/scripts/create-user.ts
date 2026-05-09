@@ -2,9 +2,9 @@ import { prisma } from "../core/db/prisma.js";
 import crypto from "crypto";
 
 async function main() {
-  const name = "Mouzin Gulzar";
-  const phone = "7889811102";
-  
+  const name = "Bazik Nisar";
+  const phone = "8899443361";
+
   // Generate a 62-character hexadecimal API key (31 bytes * 2 hex chars/byte = 62 chars)
   const apiKey = crypto.randomBytes(31).toString("hex");
 
