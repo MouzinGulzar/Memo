@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import { apiKeyAuthPlugin } from "./core/auth/apiKeyAuth.js";
 import { whatsappRoutes } from "./modules/whatsapp/routes.js";
 import { authRoutes } from "./modules/auth/routes.js";
+import { skillRoutes } from "./modules/skills/routes.js";
 import { phoneNumberRoutes } from "./modules/phoneNumbers/routes.js";
 import cookie from "@fastify/cookie";
 
@@ -23,6 +24,9 @@ await app.register(cookie, {
 });
 // Register auth routes (public)
 app.register(authRoutes);
+
+// Register skill routes
+app.register(skillRoutes);
 
 // Register WhatsApp routes
 app.register(whatsappRoutes);
