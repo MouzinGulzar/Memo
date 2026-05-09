@@ -1,11 +1,27 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { User } from "@prisma/client";
+import jwt from "jsonwebtoken";
 import { prisma } from "../db/prisma.js";
 
 declare module "fastify" {
   interface FastifyRequest {
     user?: User;
   }
+}
+
+interface JwtPayload {
+  userId: string;
+  phone: string;
+}
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set");
+  }
+
+  return secret;
 }
 
 export async function apiKeyAuthPlugin(fastify: FastifyInstance) {
@@ -18,31 +34,43 @@ export async function apiKeyAuthPlugin(fastify: FastifyInstance) {
       return;
     }
 
-    const apiKey = request.headers["x-api-key"] || (request.query as any)?.apiKey;
+    const accessToken = request.headers["authorization"]?.replace("Bearer ", "") || (request.query as any)?.accessToken;
 
-    if (!apiKey || typeof apiKey !== "string") {
+    if (!accessToken || typeof accessToken !== "string") {
       reply.status(401).send({
         error: "Unauthorized",
-        message: "Missing API Key. Please provide 'x-api-key' in request headers or 'apiKey' as a query parameter.",
+        message: "Missing Access Token. Please provide 'Authorization: Bearer <token>' in request headers or 'accessToken' as a query parameter.",
       });
       return;
     }
 
     try {
+      // Verify and decode JWT token
+      const decoded = jwt.verify(accessToken, getJwtSecret()) as JwtPayload;
+
+      // Fetch user from database using userId from token
       const user = await prisma.user.findUnique({
-        where: { apiKey },
+        where: { id: decoded.userId },
       });
 
       if (!user) {
         reply.status(401).send({
           error: "Unauthorized",
-          message: "Invalid API Key.",
+          message: "User not found.",
         });
         return;
       }
 
       request.user = user;
     } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        reply.status(401).send({
+          error: "Unauthorized",
+          message: "Invalid or expired token.",
+        });
+        return;
+      }
+
       fastify.log.error(error);
       reply.status(500).send({
         error: "Internal Server Error",
