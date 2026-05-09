@@ -14,6 +14,7 @@ model User {
   apiKey    String   @unique
   phone     String   @unique
   name      String?
+  password  String?
   createdAt DateTime @default(now())
 
   whatsAppSession WhatsAppSession?
