@@ -25,7 +25,7 @@ model User {
 model WhatsAppSession {
   id        String   @id @default(cuid())
   userId    String   @unique
-  phone     String  
+  phone     String?  
   creds     String
   keys      String
   createdAt DateTime @default(now())
